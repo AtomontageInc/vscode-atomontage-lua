@@ -1,26 +1,29 @@
 {
   "name": "vscode-atomontage-lua",
-	"displayName": "vscode-atomontage-lua",
+	"displayName": "Atomontage API Autocomplete",
 	"publisher": "AtomontageInc",
-	"description": "",
+	"icon": "images/logoSquare.png",
+	"description": "Atomontage API autocomplete for VS Code.",
 	"version": "0.0.1",
+	"keywords": [
+		"EmmyLua", "IntelliSense", "lua", "multi-root ready", "atomontage"
+	],
+	"license": "MIT",
 	"engines": {
 		"vscode": "^1.58.0"
 	},
 	"categories": [
-		"Other"
+		"Programming Languages", "Snippets", "Linters"
 	],
 	"activationEvents": [
-		"*"
+		"onLanguage:lua"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"commands": [
-			{
-				"command": "vscode-atomontage-lua.helloWorld",
-				"title": "Hello World"
-			}
-		]
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/AtomontageInc/vscode-atomontage-lua.git"
 	},
 	"extensionDependencies": [
 		"sumneko.lua"

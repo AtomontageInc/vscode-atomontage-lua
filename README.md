@@ -1,17 +1,33 @@
-# Atomontage API
+# Atomontage API Autocomplete
 
-\!\[feature X\]\(images/logo.png\)
 Atomontage API autocomplete for VS Code.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+Autocompletions for classes, properties, functions, parameters. 
+It also comes with the [Lua Language Extension](https://marketplace.visualstudio.com/items?itemName=sumneko.lua) to provide [IntelliSense](https://code.visualstudio.com/docs/editor/intellisense) for Lua.
 
-For example if there is an image subfolder under your extension project workspace:
+![feature X](images/example.gif)
 
-\!\[feature X\]\(images/logo.png\)
+Additionally through [Lua Language Server](https://marketplace.visualstudio.com/items?itemName=sumneko.lua):
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- [x] Goto Definition
+- [x] Find All References
+- [x] Hover
+- [x] Diagnostics
+- [x] Rename
+- [x] Auto Completion
+- [x] IntelliSense
+- [x] Signature Help
+- [x] Document Symbols
+- [x] Workspace Symbols
+- [x] Syntax Check
+- [x] Highlight
+- [x] Code Action
+- [x] EmmyLua Annotation
+- [x] Multi Workspace
+- [x] Semantic Tokens
+- [ ] Type Format
 
 ## Requirements
 

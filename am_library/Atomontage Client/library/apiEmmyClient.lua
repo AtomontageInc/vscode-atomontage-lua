@@ -1,19 +1,10 @@
+--- @meta
+
 --- @class Quat
 Quat = {}
 
 --- @class Config
 Config = {}
-
---- @class Server
-Server = {}
-
---- @return table
-function Server:GetClients() end
-
---- @param clientID integer client id i.e from `Server:GetClients()`
---- @param messages table data to send table may contain primitive math classes such as `Quat`, `Vec3` etc  
---- @return nil
-function Server:SendMessages(clientID, messages) end
 
 --- @class ControllerButtons
 ControllerButtons = {}
