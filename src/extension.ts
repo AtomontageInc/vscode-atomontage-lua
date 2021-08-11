@@ -62,6 +62,7 @@ export function multiRootInfo(){
 			if (selection === "Don't show again") {
 				vscode.workspace.getConfiguration("atomontage").update("ignoreMultiRootInfo", true);
 			} else if (selection === "Info") {
+				//TODO update to https later
 				vscode.env.openExternal(vscode.Uri.parse('http://docs.atomontage.com/using-vs-code#setting-up-your-workspace'));
 			}
 		});
@@ -76,11 +77,3 @@ export function activate(context: vscode.ExtensionContext) {
 
 // this method is called when your extension is deactivated
 export function deactivate() {}
-
-
-/*
-"Lua.workspace.userThirdParty": [
-        "c:\\Users\\maxkr\\Documents\\Code\\Atomontage\\vscode-atomontage-lua\\am_library"
-    ],
-
-*/

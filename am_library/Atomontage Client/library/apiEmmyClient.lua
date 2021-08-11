@@ -3,9 +3,6 @@
 --- @class Quat
 Quat = {}
 
---- @class Config
-Config = {}
-
 --- @class ControllerButtons
 ControllerButtons = {}
 
@@ -1708,121 +1705,121 @@ function VoxelDB:CopyTo(p1) end
 --- @return boolean
 function VoxelDB:Save(p1, p2, p3) end
 
---- @class ConfigMap
-ConfigMap = {}
+--- @class Config
+Config = {}
 
---- @return ConfigMap
+--- @return Config
 function Config() end
 
 --- @param p1 string
 --- @param p2 integer
 --- @return nil
-function ConfigMap:SetInt(p1, p2) end
+function Config:SetInt(p1, p2) end
 
 --- @param p1 string
 --- @param p2 number
 --- @return nil
-function ConfigMap:SetFloat(p1, p2) end
+function Config:SetFloat(p1, p2) end
 
 --- @param p1 string
 --- @param p2 boolean
 --- @return nil
-function ConfigMap:SetBool(p1, p2) end
+function Config:SetBool(p1, p2) end
 
 --- @param p1 string
 --- @param p2 string
 --- @return nil
-function ConfigMap:SetString(p1, p2) end
+function Config:SetString(p1, p2) end
 
 --- @param p1 string
 --- @param p2 Vec2
 --- @return nil
-function ConfigMap:SetVec2(p1, p2) end
+function Config:SetVec2(p1, p2) end
 
 --- @param p1 string
 --- @param p2 Vec3
 --- @return nil
-function ConfigMap:SetVec3(p1, p2) end
+function Config:SetVec3(p1, p2) end
 
 --- @param p1 string
 --- @param p2 Vec4
 --- @return nil
-function ConfigMap:SetVec4(p1, p2) end
+function Config:SetVec4(p1, p2) end
 
 --- @param p1 string
 --- @return nil
-function ConfigMap:Del(p1) end
+function Config:Del(p1) end
 
 --- @param p1 string
 --- @return boolean
-function ConfigMap:Exists(p1) end
+function Config:Exists(p1) end
 
 --- @param p1 string
 --- @param p2 integer
 --- @return integer
-function ConfigMap:GetInt(p1, p2) end
+function Config:GetInt(p1, p2) end
 
 --- @param p1 string
 --- @return integer
-function ConfigMap:GetInt(p1) end
+function Config:GetInt(p1) end
 
 --- @param p1 string
 --- @param p2 number
 --- @return number
-function ConfigMap:GetFloat(p1, p2) end
+function Config:GetFloat(p1, p2) end
 
 --- @param p1 string
 --- @return number
-function ConfigMap:GetFloat(p1) end
+function Config:GetFloat(p1) end
 
 --- @param p1 string
 --- @param p2 boolean
 --- @return boolean
-function ConfigMap:GetBool(p1, p2) end
+function Config:GetBool(p1, p2) end
 
 --- @param p1 string
 --- @return boolean
-function ConfigMap:GetBool(p1) end
+function Config:GetBool(p1) end
 
 --- @param p1 string
 --- @param p2 string
 --- @return string
-function ConfigMap:GetString(p1, p2) end
+function Config:GetString(p1, p2) end
 
 --- @param p1 string
 --- @return string
-function ConfigMap:GetString(p1) end
+function Config:GetString(p1) end
 
 --- @param p1 string
 --- @param p2 Vec2
 --- @return Vec2
-function ConfigMap:GetVec2(p1, p2) end
+function Config:GetVec2(p1, p2) end
 
 --- @param p1 string
 --- @return Vec2
-function ConfigMap:GetVec2(p1) end
+function Config:GetVec2(p1) end
 
 --- @param p1 string
 --- @param p2 Vec3
 --- @return Vec3
-function ConfigMap:GetVec3(p1, p2) end
+function Config:GetVec3(p1, p2) end
 
 --- @param p1 string
 --- @return Vec3
-function ConfigMap:GetVec3(p1) end
+function Config:GetVec3(p1) end
 
 --- @param p1 string
 --- @param p2 Vec4
 --- @return Vec4
-function ConfigMap:GetVec4(p1, p2) end
+function Config:GetVec4(p1, p2) end
 
 --- @param p1 string
 --- @return Vec4
-function ConfigMap:GetVec4(p1) end
+function Config:GetVec4(p1) end
 
 --- @param p1 Config
 --- @return table
-function ConfigMap:GetAllValuesStringified(p1) end
+function Config:GetAllValuesStringified(p1) end
 
 --[[
 
