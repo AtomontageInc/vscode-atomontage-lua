@@ -25,7 +25,18 @@
 		"onLanguage:lua"
 	],
 	"main": "./out/extension.js",
-	"contributes": {},
+	"contributes": {
+		"configuration": {
+			"title": "Atomontage",
+			"properties": {
+				"atomontage.ignoreMultiRootInfo": {
+					"type": "boolean",
+					"default": false,
+					"description": "Do not show the info window about multi root workspace again."
+				}
+			}
+		}
+	},
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/AtomontageInc/vscode-atomontage-lua.git"

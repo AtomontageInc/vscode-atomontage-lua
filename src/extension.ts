@@ -14,7 +14,11 @@ export function setUserThirdPartyAllWorkspaceFolders(folder: string, enable: boo
 	}else{
 		const config = vscode.workspace.getConfiguration("Lua");
 		setUserThirdParty(config, folder, enable);
+		
+		//this is not a multi root workspace so inform user
+		multiRootInfo();
 	}
+
 }
 
 export function setUserThirdParty(config: vscode.WorkspaceConfiguration, folder: string, enable: boolean) {
@@ -47,6 +51,20 @@ export function setUserThirdParty(config: vscode.WorkspaceConfiguration, folder:
 		}
 
 		config.update("workspace.userThirdParty", library, null);
+	}
+}
+
+export function multiRootInfo(){
+	const ignore = vscode.workspace.getConfiguration("atomontage").get("ignoreMultiRootInfo");
+	if (!ignore) {
+		vscode.window.showInformationMessage("It is recommended to set up a multi-root workspace for Atomontage projects.", "Info", "Don't show again").then(selection => {
+			console.log(selection);
+			if (selection === "Don't show again") {
+				vscode.workspace.getConfiguration("atomontage").update("ignoreMultiRootInfo", true);
+			} else if (selection === "Info") {
+				vscode.env.openExternal(vscode.Uri.parse('http://docs.atomontage.com/using-vs-code#setting-up-your-workspace'));
+			}
+		});
 	}
 }
 
