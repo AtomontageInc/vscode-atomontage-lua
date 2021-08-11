@@ -1,5 +1,16 @@
 --- @meta
 
+--- @class Script
+--- @field component Component
+script = {}
+
+function script:Start() end
+
+-- Update is called every frame
+--- @param dt number delta time since last update
+--- @param t number total time passed
+function script:Update(dt, t) end
+
 --- @class Quat
 Quat = {}
 
