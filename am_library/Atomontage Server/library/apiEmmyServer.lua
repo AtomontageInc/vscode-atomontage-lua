@@ -1776,3 +1776,453 @@ ScriptComponent = {}
 function ScriptComponent() end
 
 
+--- @class AttachmentFlags
+AttachmentFlags = {
+	-- test
+	Depth = 0,
+	DepthAndStencil = 1,
+	-- bladdddla
+	Color0 = 2,
+	Color1 = 3,
+	Color2 = 4,
+	Color3 = 5,
+}
+
+--- @class BlendFactor
+BlendFactor = {
+	Zero = 0,
+	SrcColor = 1,
+	DstColor = 2,
+	OneMinusDstColor = 3,
+	SrcAlpha = 4,
+	OneMinusSrcAlpha = 5,
+	DstAlpha = 6,
+	OneMinusDstAlpha = 7,
+	One = 8,
+	OneMinusSrcColor = 9,
+	ConstantColor = 10,
+	OneMinusConstantColor = 11,
+	ConstantAlpha = 12,
+	OneMinusConstantAlpha = 13,
+	SrcAlphaSaturate = 14,
+	Src1Color = 15,
+	OneMinusSrc1Color = 16,
+	Src1Alpha = 17,
+	OneMinusSrc1Alpha = 18,
+}
+
+--- @class BlendOp
+BlendOp = {
+	Add = 0,
+	Subtract = 1,
+	ReverseSubtract = 2,
+	Min = 3,
+	Max = 4,
+}
+
+--- @class CpuArch
+CpuArch = {
+	Unknown = 0,
+	X86 = 1,
+	X86_64 = 2,
+	Arm = 3,
+	Arm64 = 4,
+	Wasm = 5,
+}
+
+--- @class CullMode
+CullMode = {
+	None = 0,
+	Front = 1,
+	Back = 2,
+	FrontAndBack = 3,
+}
+
+--- @class DepthBufferMode
+DepthBufferMode = {
+	None = 0,
+	DepthOnly = 1,
+	DepthAndStencil = 2,
+}
+
+--- @class DrawingCommandsFlags
+DrawingCommandsFlags = {
+	BaseVertex = 0,
+	BaseInstance = 1,
+}
+
+--- @class FrontFaceWinding
+FrontFaceWinding = {
+	Clockwise = 0,
+	CounterClockwise = 1,
+}
+
+--- @class Function
+Function = {
+	Never = 0,
+	Less = 1,
+	Equal = 2,
+	Lequl = 3,
+	Greater = 4,
+	Notequal = 5,
+	Gequal = 6,
+	Always = 7,
+}
+
+--- @class LuaErrorType
+LuaErrorType = {
+	None = 0,
+	DoFile = 1,
+	Runtime = 2,
+	UIAction = 3,
+}
+
+--- @class MemTarget
+MemTarget = {
+	SystemMem = 0,
+	VideoMem = 1,
+}
+
+--- @class MessageLevel
+MessageLevel = {
+	Critical = 0,
+	Error = 1,
+	Warn = 2,
+	Info = 3,
+	Debug = 4,
+	Trace = 5,
+}
+
+--- @class Operation
+Operation = {
+	Keep = 0,
+	Zero = 1,
+	Replace = 2,
+	Increment = 3,
+	IncrementWrap = 4,
+	Decrement = 5,
+	DecrementWrap = 6,
+	Invert = 7,
+}
+
+--- @class PixelFormat
+PixelFormat = {
+	Unknown = 0,
+	RGB888 = 1,
+	RGBA8888 = 2,
+	RGB565 = 3,
+	RGBA5551 = 4,
+	RGBA4444 = 5,
+	BGR888 = 6,
+	BGRA8888 = 7,
+	Depth16 = 8,
+	Depth24 = 9,
+	Depth32 = 10,
+	Depth24Stencil8 = 11,
+	A8 = 12,
+	LA88 = 13,
+	R32f = 14,
+	RGB32f = 15,
+	RGBA32f = 16,
+	R16f = 17,
+	RGB16f = 18,
+	RGBA16f = 19,
+	DXT1 = 20,
+	DXT1_with_ALPHA = 21,
+	DXT3 = 22,
+	DXT5 = 23,
+	ATC_RGB = 24,
+	ATC_RGBEA = 25,
+	ATC_RGBIA = 26,
+	ETC_RGB = 27,
+	ETC2_RGB = 28,
+	ETC2_RGBA_PUNCHTHROUGH_ALPHA = 29,
+	ETC2_RGBA = 30,
+	PVRTC4_RGB = 31,
+	PVRTC2_RGB = 32,
+	PVRTC4_RGBA = 33,
+	PVRTC2_RGBA = 34,
+	Int8 = 35,
+	Int16 = 36,
+	Int32 = 37,
+	UInt8 = 38,
+	UInt16 = 39,
+	UInt32 = 40,
+}
+
+--- @class PolygonMode
+PolygonMode = {
+	Fill = 0,
+	Line = 1,
+	Point = 2,
+}
+
+--- @class PrimitiveTopology
+PrimitiveTopology = {
+	Points = 0,
+	LineStrip = 1,
+	Lines = 2,
+	TriangleStrip = 3,
+	TriangleFan = 4,
+	Triangles = 5,
+}
+
+--- @class RTXShaderGroupType
+RTXShaderGroupType = {
+	General = 0,
+	TrianglesHitGroup = 1,
+	ProceduralHitGroup = 2,
+}
+
+--- @class RenderTargetAttachmentLayout
+RenderTargetAttachmentLayout = {
+	Undefined = 0,
+	General = 1,
+	ColorAttachmentOptimal = 2,
+	DepthStencilAttachmentOptimal = 3,
+	DepthStencilReadOnlyOptimal = 4,
+	ShaderReadOnlyOptimal = 5,
+	TransferSrcOptimal = 6,
+	TransferDstOptimal = 7,
+	Preinitialized = 8,
+	DepthReadOnlyStencilAttachmentOptimal = 9,
+	DepthAttachmentStencilReadOnlyOptimal = 10,
+	PresentSrc = 11,
+	SharedPresentSrc = 12,
+	ShadingRateOptimal = 13,
+	FragmentDensityMapOptimal = 14,
+}
+
+--- @class RenderTargetAttachmentLoadOp
+RenderTargetAttachmentLoadOp = {
+	Load = 0,
+	Clear = 1,
+	DontCare = 2,
+}
+
+--- @class RenderTargetAttachmentStoreOp
+RenderTargetAttachmentStoreOp = {
+	Store = 0,
+	DontCare = 1,
+}
+
+--- @class ResourceMemoryUsage
+ResourceMemoryUsage = {
+	Unknown = 0,
+	GpuOnly = 1,
+	CpuToGpu = 2,
+	GpuToCpu = 3,
+}
+
+--- @class ResourceState
+ResourceState = {
+	Unknown = 0,
+	Undefined = 1,
+	VertexBuffer = 2,
+	ConstantBuffer = 3,
+	IndexBuffer = 4,
+	SBTBuffer = 5,
+	RenderTarget = 6,
+	UnorderedAccess = 7,
+	DepthWrite = 8,
+	DepthRead = 9,
+	ShaderResource = 10,
+	IndirectArgument = 11,
+	CopyDest = 12,
+	CopySource = 13,
+	AccelerationStructure = 14,
+	Present = 15,
+}
+
+--- @class ResourceStateTransitionMode
+ResourceStateTransitionMode = {
+	None = 0,
+	Transition = 1,
+	Verify = 2,
+}
+
+--- @class ResourceUsage
+ResourceUsage = {
+	Static = 0,
+	Dynamic = 1,
+	Stream = 2,
+}
+
+--- @class ShaderResourceType
+ShaderResourceType = {
+	Unknown = 0,
+	Bool = 1,
+	BoolVec2 = 2,
+	BoolVec3 = 3,
+	BoolVec4 = 4,
+	Int = 5,
+	IntVec2 = 6,
+	IntVec3 = 7,
+	IntVec4 = 8,
+	UInt = 9,
+	UIntVec2 = 10,
+	UIntVec3 = 11,
+	UIntVec4 = 12,
+	Float = 13,
+	FloatVec2 = 14,
+	FloatVec3 = 15,
+	FloatVec4 = 16,
+	FloatMat2x2 = 17,
+	FloatMat2x3 = 18,
+	FloatMat2x4 = 19,
+	FloatMat3x2 = 20,
+	FloatMat3x3 = 21,
+	FloatMat3x4 = 22,
+	FloatMat4x2 = 23,
+	FloatMat4x3 = 24,
+	FloatMat4x4 = 25,
+	Double = 26,
+	DoubleVec2 = 27,
+	DoubleVec3 = 28,
+	DoubleVec4 = 29,
+	DoubleMat2x2 = 30,
+	DoubleMat2x3 = 31,
+	DoubleMat2x4 = 32,
+	DoubleMat3x2 = 33,
+	DoubleMat3x3 = 34,
+	DoubleMat3x4 = 35,
+	DoubleMat4x2 = 36,
+	DoubleMat4x3 = 37,
+	DoubleMat4x4 = 38,
+	Image = 39,
+	Texture = 40,
+	Buffer = 41,
+	AccelerationStructure = 42,
+}
+
+--- @class System
+System = {
+	Unknown = 0,
+	Windows = 1,
+	Linux = 2,
+	WebBrowser = 3,
+	MacOS = 4,
+	iOS = 5,
+	Android = 6,
+}
+
+--- @class TextureFiltering
+TextureFiltering = {
+	None = 0,
+	Linear = 1,
+	Bilinear = 2,
+	Trilinear = 3,
+	Anisotropic = 4,
+}
+
+--- @class TextureWrappingMode
+TextureWrappingMode = {
+	ClampToEdge = 0,
+	Repeat = 1,
+	MirroredRepeat = 2,
+}
+
+--- @class Type
+Type = {
+	Unknown = 0,
+	Vertex = 1,
+	TesselationControl = 2,
+	TesselationEvaluation = 3,
+	Geometry = 4,
+	Fragment = 5,
+	Compute = 6,
+	RayGen = 7,
+	AnyHit = 8,
+	ClosestHit = 9,
+	Miss = 10,
+	Intersection = 11,
+	Callable = 12,
+}
+
+--- @class UpdateFrequency
+UpdateFrequency = {
+	Once = 0,
+	Frame = 1,
+	ObjectFrame = 2,
+	ObjectDraw = 3,
+}
+
+--- @class UsageFlagBits
+UsageFlagBits = {
+	UsageTransferSrcBIT = 0,
+	UsageTransferDstBIT = 1,
+	UsageUniformTexelBufferBIT = 2,
+	UsageStorageTexelBufferBIT = 3,
+	UsageUniformBufferBIT = 4,
+	UsageStorageBufferBIT = 5,
+	UsageIndexBufferBIT = 6,
+	UsageVertexBufferBIT = 7,
+	UsageIndirectBufferBIT = 8,
+	UsageConditionalRenderingBIT = 9,
+	UsageRayTracingBIT = 10,
+	UsageShaderDeviceAddressBIT = 11,
+}
+
+--- @class VSyncMode
+VSyncMode = {
+	Default = 0,
+	Enabled = 1,
+	Disabled = 2,
+	Adaptive = 3,
+}
+
+--- @class VertexComponent
+VertexComponent = {
+	Position0 = 0,
+	Position1 = 1,
+	Position2 = 2,
+	Position3 = 3,
+	TexCoord0 = 4,
+	TexCoord1 = 5,
+	TexCoord2 = 6,
+	TexCoord3 = 7,
+	TexCoord4 = 8,
+	Color0 = 9,
+	Color1 = 10,
+	Index0 = 11,
+	Index1 = 12,
+	Normal0 = 13,
+	Normal1 = 14,
+	Tangent = 15,
+	Bitangent = 16,
+	Index = 17,
+	Unknown = 18,
+}
+
+--- @class VertexComponentFormat
+VertexComponentFormat = {
+	Unknown = 0,
+	Int8 = 1,
+	Int8Vec2 = 2,
+	Int8Vec3 = 3,
+	Int8Vec4 = 4,
+	Int16 = 5,
+	Int16Vec2 = 6,
+	Int16Vec3 = 7,
+	Int16Vec4 = 8,
+	Int32 = 9,
+	Int32Vec2 = 10,
+	Int32Vec3 = 11,
+	Int32Vec4 = 12,
+	UInt8 = 13,
+	UInt8Vec2 = 14,
+	UInt8Vec3 = 15,
+	UInt8Vec4 = 16,
+	UInt16 = 17,
+	UInt16Vec2 = 18,
+	UInt16Vec3 = 19,
+	UInt16Vec4 = 20,
+	UInt32 = 21,
+	UInt32Vec2 = 22,
+	UInt32Vec3 = 23,
+	UInt32Vec4 = 24,
+	Float = 25,
+	FloatVec2 = 26,
+	FloatVec3 = 27,
+	FloatVec4 = 28,
+}
