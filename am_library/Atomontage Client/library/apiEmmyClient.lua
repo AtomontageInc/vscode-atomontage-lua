@@ -1,5 +1,23 @@
 --- @meta
 
+--- @class Script
+--- @field component Component
+script = {}
+
+-- Called on script instance initialization. Usually after changing `.instance` or `.file` property
+function script:Attach() end
+
+-- Called on script release. Usually on object destruction or to release old script instance during change of `.instance` or `.file` property
+function script:Detach() end
+
+-- Called once before the first Update
+function script:Start() end
+
+-- Called if updates are enabled (they are enabled automatically if attached script has this method). dt is frame time delta in seconds and t is application time in seconds.
+--- @param dt number delta time since last update
+--- @param t number total time passed
+function script:Update(dt, t) end
+
 --- @class Quat
 Quat = {}
 
