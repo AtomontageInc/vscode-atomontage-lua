@@ -14,13 +14,13 @@ configs = {
     {
         key    = 'Lua.runtime.builtin',
         action = 'prop',
-        prop   = 'io',
+        prop   = 'os',
         value  = 'disable',
     },
     {
         key    = 'Lua.runtime.builtin',
         action = 'prop',
-        prop   = 'os',
+        prop   = 'io',
         value  = 'disable',
     },
 }
