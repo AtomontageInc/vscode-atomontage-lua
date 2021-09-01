@@ -35,7 +35,13 @@
 					"description": "Do not show the info window about multi root workspace again."
 				}
 			}
-		}
+		},
+		"snippets": [
+			{
+				"language": "lua",
+				"path": "./snippets/snippets.json"
+			}
+		]
 	},
 	"repository": {
 		"type": "git",

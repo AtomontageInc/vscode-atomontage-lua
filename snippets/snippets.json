@@ -1,0 +1,22 @@
+{
+	"Script Component": {
+		"prefix": [
+			"script",
+			"local script"
+		],
+		"body": [
+			"local script = {}",
+			"",
+			"function script:Start()",
+			"$0",
+			"end",
+			"",
+			"function script:Update(dt, t)",
+			"",
+			"end",
+			"",
+			"return script"
+		],
+		"description": "Script Component with callbacks"
+	}
+}
