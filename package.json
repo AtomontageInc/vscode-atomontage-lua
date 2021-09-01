@@ -4,7 +4,7 @@
 	"publisher": "AtomontageInc",
 	"icon": "images/logoSquare.png",
 	"description": "Atomontage API autocomplete for VS Code.",
-	"version": "0.3.0",
+	"version": "0.4.0",
 	"keywords": [
 		"EmmyLua",
 		"IntelliSense",
