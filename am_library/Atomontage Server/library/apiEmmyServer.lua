@@ -1,27 +1,9 @@
 --- @meta
 
---- @class Server
-Server = {}
-
--- Returns a table of connected client IDs i.e. `{0,1,2,5}`
---- @return table
-function Server:GetClients() end
-
--- Send message to client 
---- @param clientID integer client id i.e from `Server:GetClients()`
---- @param messages table data to send table may contain primitive math classes such as `Quat`, `Vec3` etc  
---- @return nil
-function Server:SendMessages(clientID, messages) end
-
---- @return table
-function Server:ReceiveMessages() end
-
---- @return CommandLine
-function Server:GetCommandLine() end
-
-
 --- @class Script
 --- @field component Component
+--- @field onServer boolean
+--- @field onClient boolean
 script = {}
 
 -- Called on script instance initialization. Usually after changing `.instance` or `.file` property
@@ -35,15 +17,38 @@ function script:Start() end
 
 -- Called if updates are enabled (they are enabled automatically if attached script has this method). dt is frame time delta in seconds and t is application time in seconds.
 --- @param dt number delta time since last update
---- @param t number total time passed
-function script:Update(dt, t) end
-
---- @class Quat
-Quat = {}
+function script:Update(dt) end
 
 --- @class ControllerButtons
 ControllerButtons = {}
 
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/AmStreamingStats)
+]]
+--- @class AmStreamingStats
+--- @field sentTotals AmStreamingStatsTotal
+--- @field recvTotals AmStreamingStatsTotal
+--- @field sentPerFrame AmStreamingStatsStatPerFrame
+--- @field recvPerFrame AmStreamingStatsStatPerFrame
+--- @field sentPerSecond AmStreamingStatsStatPerInterval
+--- @field recvPerSecond AmStreamingStatsStatPerInterval
+--- @field sentPerCustTime AmStreamingStatsStatPerInterval
+--- @field recvPerCustTime AmStreamingStatsStatPerInterval
+--- @field sentPerMessage AmStreamingStatsStatPerMessage
+--- @field recvPerMessage AmStreamingStatsStatPerMessage
+AmStreamingStats = {}
+
+--[[
+`Client`
+`Server`
+
+alksjdlkajsdkljalkjd asdalksd
+
+[View Documentation](https://docs.atomontage.com/api/Angle)
+]]
 --- @class Angle
 --- @field sine number
 --- @field cosine number
@@ -61,9 +66,6 @@ function Angle(p1, p2) end
 --- @return Angle
 function Angle(p1) end
 
---- @return Angle
-function Angle() end
-
 --- @param p1 Angle
 --- @param p2 Angle
 --- @return boolean
@@ -76,22 +78,66 @@ function Angle:Set(p1) end
 --- @return number
 function Angle:Get() end
 
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/AssetManager)
+]]
+--- @class AssetManager
+AssetManager = {}
+
+--- @param p1 AssetManager
+--- @return userdata
+function AssetManager:GetAssets(p1) end
+
+--- @param p1 string
+--- @return ResResource
+function AssetManager:Get(p1) end
+
+--- @param p1 string
+--- @param p2 string
+--- @return boolean
+function AssetManager:AddAsset(p1, p2) end
+
+--- @param p1 type
+--- @param p2 string
+--- @return boolean
+function AssetManager:AddAsset(p1, p2) end
+
+--- @param p1 ResResource
+--- @return type
+function AssetManager:GetResourceType(p1) end
+
+--- @param p1 type
+--- @return boolean
+function AssetManager:IsAssetType(p1) end
+
+--- @return userdata
+function AssetManager:GetAssetTypes() end
+
+--- @param p1 AssetManager
+--- @return string
+function AssetManager:GetAssetsPath(p1) end
+
+--- @param p1 AssetManager
+--- @return string
+function AssetManager:GetFilePath(p1) end
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Camera)
+]]
 --- @class Camera
 --- @field transformation Transformation
 --- @field transform Transformation
 Camera = {}
 
---- @param p1 string
---- @return Camera
-function Camera(p1) end
-
 --- @param p1 Object3D
 --- @return Transformation
 function Camera:GetTransformation(p1) end
-
---- @param p1 Transformation
---- @return nil
-function Camera:SetTransformation(p1) end
 
 --- @param p1 Transformation
 --- @return nil
@@ -126,7 +172,7 @@ function Camera:GetRight(p1) end
 function Camera:GetUp(p1) end
 
 --- @param p1 Object3D
---- @return Mat4
+--- @return Matrix4f
 function Camera:GetLtw(p1) end
 
 --- @param p1 Object3D
@@ -139,6 +185,10 @@ function Camera:SetPosition(p1) end
 
 --- @return Transformation
 function Camera:GetTransformation() end
+
+--- @param p1 Transformation
+--- @return nil
+function Camera:SetTransformation(p1) end
 
 --- @param p1 number
 --- @return nil
@@ -165,7 +215,7 @@ function Camera:GetRight() end
 --- @return Vec3
 function Camera:GetUp() end
 
---- @return Mat4
+--- @return Matrix4f
 function Camera:GetLtw() end
 
 --- @return Vec3
@@ -182,7 +232,7 @@ function Camera:GetFrustum() end
 --- @return nil
 function Camera:SetFrustum(p1) end
 
---- @return Mat4
+--- @return Matrix4f
 function Camera:GetProjection() end
 
 --- @param p1 Vec2
@@ -197,6 +247,10 @@ function Camera:SetFovY(p1) end
 function Camera:GetFovY() end
 
 --[[
+`Client`
+:::info Client Only
+This class is only available on client
+:::
 
 
 blallblalb lalal bal babl aabab blallblalb lalal bal babl aabab blallblalb lalal bal babl aabab blallblalb lalal bal babl aabab blallblalb lalal bal babl aabab blallblalb lalal bal babl aabab blallblalb lalal bal babl aabab
@@ -209,6 +263,43 @@ blallblalb lalal bal babl aabab blallblalb lalal bal babl aabab blallblalb lalal
 --- @field platform string
 --- @field sysInfo string
 Client = {}
+
+--- @param message table
+--- @return nil
+function Client:SendMessage(message) end
+
+--[[
+Send a message to server scripts. The message is a table
+
+```lua
+-- send message examples
+Client:SendMessage({act = 'erase', pos = Vec3(0,0,0), rad = 1})
+-- send message example with no string use
+Client:SendMessage({[1] = 1, [2] = 100, [3] = false, [4] = Vec2(0)})
+-- send message with no keys, it's the same message as the line above
+Client:SendMessage({1, 100, false, Vec2(0)})
+
+-- send more messages in one call
+Client:SendMessages({	
+    {act = 1}, -- message 1
+    {act = 5}, -- message 2
+    {1, 100, false}, -- message 3 (with no keys)
+    {act = 2, brush = 'paint'}}) -- message 4
+
+
+
+local my_msgs = {}
+table.insert(my_msgs, {act = 'erase'})
+table.insert(my_msgs, {act = 'erase'})
+table.insert(my_msgs, {act = 'erase'})
+Client:SendMessages(my_msgs)
+```
+
+[View Documentation](https://docs.atomontage.com/api/Client#void-SendMessages-table-tableOfMessages)
+]]
+--- @param tableOfMessages table
+--- @return nil
+function Client:SendMessages(tableOfMessages) end
 
 --[[
 Recieve messages send by server scripts
@@ -234,34 +325,6 @@ end
 --- @return table
 function Client:ReceiveMessages() end
 
---- @return nil
-function Client:ToggleUICreatorWindow() end
-
---[[
-Returns [`Camera`](/api/camera)
-
-[View Documentation](https://docs.atomontage.com/api/Client#Camera-GetCamera)
-]]
---- @return Camera
-function Client:GetCamera() end
-
---- @return boolean
-function Client:IsClient() end
-
---- @return boolean
-function Client:IsServer() end
-
---- @return Client
-function Client() end
-
---- @param message table
---- @return nil
-function Client:SendMessage(message) end
-
---- @param tableOfMessages table
---- @return nil
-function Client:SendMessages(tableOfMessages) end
-
 --- @param actionID integer
 --- @param item UIItem
 --- @param value userdata
@@ -271,6 +334,9 @@ function Client:UIItemUpdate(actionID, item, value) end
 --- @param keyActionID string
 --- @return nil
 function Client:OpenKeyboardShortcutInput(keyActionID) end
+
+--- @return nil
+function Client:ToggleUICreatorWindow() end
 
 --- @return nil
 function Client:ToggleUIStudioSDK() end
@@ -474,6 +540,14 @@ function Client:OnLuaLog() end
 --- @return nil
 function Client:ScrollToLastestLuaLog() end
 
+--[[
+Returns [`Camera`](/api/camera)
+
+[View Documentation](https://docs.atomontage.com/api/Client#Camera-GetCamera)
+]]
+--- @return Camera
+function Client:GetCamera() end
+
 --- @return userdata
 function Client:GetVisibleWindows() end
 
@@ -494,6 +568,12 @@ function Client:Log(p1) end
 --- @return AmStreamingStats
 function Client:GetVoxelStreamStats() end
 
+--- @return boolean
+function Client:IsClient() end
+
+--- @return boolean
+function Client:IsServer() end
+
 --- @param uiItem UIItem
 --- @return nil
 function Client:SelectItemInUICreator(uiItem) end
@@ -512,6 +592,41 @@ function Client:GetUIActionScript(uiActionID) end
 
 --- @return integer
 function Client:GetCurrentUIActionID() end
+
+--- @param p1 string
+--- @param p2 Vec2
+--- @return nil
+function Client:WriteToScreen(p1, p2) end
+
+--- @param p1 string
+--- @param p2 Vec2
+--- @param p3 Vec2
+--- @return nil
+function Client:WriteToScreen(p1, p2, p3) end
+
+--- @param p1 string
+--- @param p2 Vec2
+--- @param p3 Vec2
+--- @param p4 Vec4
+--- @return nil
+function Client:WriteToScreen(p1, p2, p3, p4) end
+
+--- @param p1 string
+--- @param p2 Vec2
+--- @param p3 Vec2
+--- @param p4 Vec4
+--- @param p5 integer
+--- @return nil
+function Client:WriteToScreen(p1, p2, p3, p4, p5) end
+
+--- @param p1 string
+--- @param p2 Vec2
+--- @param p3 Vec2
+--- @param p4 Vec4
+--- @param p5 integer
+--- @param p6 number
+--- @return nil
+function Client:WriteToScreen(p1, p2, p3, p4, p5, p6) end
 
 --- @return nil
 function Client:CloseApp() end
@@ -533,6 +648,13 @@ function Client:GetViewportSize() end
 
 --- @return CommandLine
 function Client:GetCommandLine() end
+
+--- @return Vec4
+function Client:GetBGColor() end
+
+--- @param p1 Vec4
+--- @return nil
+function Client:SetBGColor(p1) end
 
 --- @return boolean
 function Client:GetVREnabled() end
@@ -570,61 +692,29 @@ function Client:ToggleChannelRendering() end
 --- @return nil
 function Client:SaveEntityPath() end
 
---- @param p1 string
---- @param p2 Vec2
---- @param p3 Vec2
---- @param p4 Vec4
---- @param p5 integer
---- @param p6 number
---- @return nil
-function Client:WriteToScreen(p1, p2, p3, p4, p5, p6) end
+--[[
+`Client`
+`Server`
 
---- @return Vec4
-function Client:GetBGColor() end
-
---- @param p1 Vec4
---- @return nil
-function Client:SetBGColor(p1) end
+[View Documentation](https://docs.atomontage.com/api/ClientConnectionInfo)
+]]
+--- @class ClientConnectionInfo
+--- @field networkState string
+--- @field ID integer
+--- @field name string
+--- @field IP string
+--- @field port integer
+--- @field streamingVersion string
+ClientConnectionInfo = {}
 
 --[[
-Send a message to server scripts. The message is a table
+`Client`
+`Server`
 
-```lua
--- send message examples
-Client:SendMessage({act = 'erase', pos = Vec3(0,0,0), rad = 1})
--- send message example with no string use
-Client:SendMessage({[1] = 1, [2] = 100, [3] = false, [4] = Vec2(0)})
--- send message with no keys, it's the same message as the line above
-Client:SendMessage({1, 100, false, Vec2(0)})
-
--- send more messages in one call
-Client:SendMessages({	
-    {act = 1}, -- message 1
-    {act = 5}, -- message 2
-    {1, 100, false}, -- message 3 (with no keys)
-    {act = 2, brush = 'paint'}}) -- message 4
-
-
-
-local my_msgs = {}
-table.insert(my_msgs, {act = 'erase'})
-table.insert(my_msgs, {act = 'erase'})
-table.insert(my_msgs, {act = 'erase'})
-Client:SendMessages(my_msgs)
-```
-
-[View Documentation](https://docs.atomontage.com/api/Client#void-SendMessage-table)
+[View Documentation](https://docs.atomontage.com/api/CommandLine)
 ]]
---- @param p1 table
---- @return nil
-function Client:SendMessage(p1) end
-
 --- @class CommandLine
 CommandLine = {}
-
---- @param p1 string
---- @return CommandLine
-function CommandLine(p1) end
 
 --- @param p1 string
 --- @return boolean
@@ -651,6 +741,8 @@ function CommandLine:GetOption(p1, p2) end
 function CommandLine:GetOptionVec3(p1, p2) end
 
 --[[
+`Client`
+`Server`
 
 See also: [ScriptComponent](ScriptComponent)
 
@@ -661,14 +753,14 @@ See also: [ScriptComponent](ScriptComponent)
 --- @field object Object
 Component = {}
 
---- @return Component
-function Component() end
+--[[
+`Client`
+`Server`
 
+[View Documentation](https://docs.atomontage.com/api/Config)
+]]
 --- @class Config
 Config = {}
-
---- @return Config
-function Config() end
 
 --- @param p1 string
 --- @param p2 integer
@@ -780,6 +872,23 @@ function Config:GetVec4(p1) end
 --- @return table
 function Config:GetAllValuesStringified(p1) end
 
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/ConnectionInfo)
+]]
+--- @class ConnectionInfo
+--- @field client ClientConnectionInfo
+--- @field server ServerConnectionInfo
+ConnectionInfo = {}
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Frustum)
+]]
 --- @class Frustum
 --- @field nearPlane number
 --- @field farPlane number
@@ -790,14 +899,14 @@ Frustum = {}
 --- @return Frustum
 function Frustum() end
 
---- @return Frustum
-function Frustum() end
+--[[
+`Client`
+`Server`
 
+[View Documentation](https://docs.atomontage.com/api/Input)
+]]
 --- @class Input
 Input = {}
-
---- @return Input
-function Input() end
 
 --- @return Input
 function Input() end
@@ -884,6 +993,24 @@ function Input:MouseBtnUp(p1) end
 --- @return integer
 function Input:MouseWheel() end
 
+--- @return Vec2
+function Input:MousePos() end
+
+--- @return Vec2
+function Input:MousePosLast() end
+
+--- @return Vec2
+function Input:MouseMove() end
+
+--- @return Vec2
+function Input:MousePosRel() end
+
+--- @return Vec2
+function Input:MousePosRelLast() end
+
+--- @return Vec2
+function Input:MouseMoveRel() end
+
 --- @return userdata
 function Input:GetMouseButtonsDown() end
 
@@ -893,11 +1020,21 @@ function Input:GetMouseButtons() end
 --- @return userdata
 function Input:GetMouseButtonsUp() end
 
+--- @return boolean
+function Input:GetRelativeMouseMode() end
+
+--- @param p1 boolean
+--- @return nil
+function Input:SetRelativeMouseMode(p1) end
+
 --- @return number
 function Input:GesturePinch() end
 
 --- @return number
 function Input:GestureRotate() end
+
+--- @return Vec2
+function Input:GestureMove() end
 
 --- @return integer
 function Input:NumFingers() end
@@ -906,9 +1043,16 @@ function Input:NumFingers() end
 --- @return boolean
 function Input:FingerDown(p1) end
 
+--- @return userdata
+function Input:Fingers() end
+
 --- @param p1 integer
 --- @return boolean
 function Input:FingerUp(p1) end
+
+--- @param p1 integer
+--- @return Vec2
+function Input:FingerPos(p1) end
 
 --- @param p1 integer
 --- @param p2 ControllerButtons
@@ -922,6 +1066,10 @@ function Input:VrHandTrigger(p1) end
 --- @param p1 integer
 --- @return number
 function Input:VrIndexTrigger(p1) end
+
+--- @param p1 integer
+--- @return Vec2
+function Input:VrThumbStick(p1) end
 
 --- @param p1 integer
 --- @return string
@@ -966,69 +1114,23 @@ function Input:JoyAxis(p1, p2) end
 --- @return table
 function Input:GetInputEvents(p1) end
 
---- @return userdata
-function Input:Fingers() end
+--[[
+`Client`
+`Server`
 
---- @return boolean
-function Input:GetRelativeMouseMode() end
-
---- @param p1 boolean
---- @return nil
-function Input:SetRelativeMouseMode(p1) end
-
---- @return Vec2
-function Input:MousePos() end
-
---- @return Vec2
-function Input:MousePosLast() end
-
---- @return Vec2
-function Input:MouseMove() end
-
---- @return Vec2
-function Input:MousePosRel() end
-
---- @return Vec2
-function Input:MousePosRelLast() end
-
---- @return Vec2
-function Input:MouseMoveRel() end
-
---- @return Vec2
-function Input:GestureMove() end
-
---- @param p1 integer
---- @return Vec2
-function Input:FingerPos(p1) end
-
---- @param p1 integer
---- @return Vec2
-function Input:VrThumbStick(p1) end
-
+[View Documentation](https://docs.atomontage.com/api/LightingUpdate)
+]]
 --- @class LightingUpdate
 --- @field realtimeLighting RealtimeLightingInfo
 LightingUpdate = {}
 
---- @class Mat4
-Mat4 = {}
+--[[
+`Client`
+`Server`
 
---- @return Mat4
-function Mat4() end
-
---- @param p1 Mat4
---- @return Mat4
-function Mat4(p1) end
-
---- @return Mat4
-function Mat4() end
-
+[View Documentation](https://docs.atomontage.com/api/Material)
+]]
 --- @class Material
---- @field shaderFiles ResourceReference
---- @field polygonMode PolygonMode
---- @field depthStencil ResourceReference
---- @field blend ResourceReference
---- @field defines string
---- @field uniforms userdata
 Material = {}
 
 --- @param p1 string
@@ -1051,11 +1153,6 @@ function Material:HasProperty(p1) end
 function Material:GetPropertyVec3(p1) end
 
 --- @param p1 string
---- @param p2 Vec3
---- @return nil
-function Material:SetProperty(p1, p2) end
-
---- @param p1 string
 --- @return Vec4
 function Material:GetPropertyVec4(p1) end
 
@@ -1064,6 +1161,33 @@ function Material:GetPropertyVec4(p1) end
 --- @return nil
 function Material:SetProperty(p1, p2) end
 
+--- @param p1 string
+--- @param p2 Vec3
+--- @return nil
+function Material:SetProperty(p1, p2) end
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Matrix4f)
+]]
+--- @class Matrix4f
+Matrix4f = {}
+
+--- @return Matrix4f
+function Matrix4f() end
+
+--- @param p1 Matrix4f
+--- @return Matrix4f
+function Matrix4f(p1) end
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/MeshData)
+]]
 --- @class MeshData
 --- @field file string
 --- @field data MeshDataBuilder
@@ -1071,6 +1195,12 @@ function Material:SetProperty(p1, p2) end
 --- @field object Object
 MeshData = {}
 
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/MeshDataBuilder)
+]]
 --- @class MeshDataBuilder
 --- @field static boolean
 --- @field dynamic boolean
@@ -1081,11 +1211,28 @@ MeshDataBuilder = {}
 --- @return MeshDataBuilder
 function MeshDataBuilder() end
 
---- @return MeshDataBuilder
-function MeshDataBuilder() end
-
 --- @return nil
 function MeshDataBuilder:Clear() end
+
+--- @param p1 Vec3
+--- @param p2 Vec4
+--- @return integer
+function MeshDataBuilder:AddVertex(p1, p2) end
+
+--- @param p1 Vec3
+--- @param p2 Vec2
+--- @param p3 Vec4
+--- @return integer
+function MeshDataBuilder:AddVertex(p1, p2, p3) end
+
+--- @param p1 Vec3
+--- @param p2 Vec2
+--- @return integer
+function MeshDataBuilder:AddVertex(p1, p2) end
+
+--- @param p1 Vec3
+--- @return integer
+function MeshDataBuilder:AddVertex(p1) end
 
 --- @param p1 integer
 --- @param p2 integer
@@ -1102,43 +1249,72 @@ function MeshDataBuilder:AddIndex(p1, p2) end
 --- @return nil
 function MeshDataBuilder:AddIndex(p1) end
 
---- @param p1 Vec3
---- @param p2 Vec2
---- @return integer
-function MeshDataBuilder:AddVertex(p1, p2) end
+--[[
+`Client`
+`Server`
 
---- @param p1 Vec3
---- @return integer
-function MeshDataBuilder:AddVertex(p1) end
-
---- @param p1 Vec3
---- @param p2 Vec4
---- @return integer
-function MeshDataBuilder:AddVertex(p1, p2) end
-
---- @param p1 Vec3
---- @param p2 Vec2
---- @param p3 Vec4
---- @return integer
-function MeshDataBuilder:AddVertex(p1, p2, p3) end
-
+[View Documentation](https://docs.atomontage.com/api/MeshRender)
+]]
 --- @class MeshRender
 --- @field material userdata
 --- @field type string
 --- @field object Object
 MeshRender = {}
 
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/NetworkStat)
+]]
+--- @class NetworkStat
+--- @field receivedUIMessageCount integer
+--- @field receivedUIMessageCountPerSecond integer
+--- @field receivedUIData integer
+--- @field receivedUIDataPerSecond integer
+--- @field receivedUIDataInFrame integer
+--- @field receivedUIDataInLastMessage integer
+--- @field receivedLuaMessageCount integer
+--- @field receivedLuaMessageCountPerSecond integer
+--- @field receivedLuaData integer
+--- @field receivedLuaDataPerSecond integer
+--- @field receivedLuaDataInFrame integer
+--- @field receivedLuaDataInLastMessage integer
+--- @field receivedMessageCount integer
+--- @field receivedMessageCountPerSecond integer
+--- @field receivedData integer
+--- @field receivedDataPerSecond integer
+--- @field receivedDataInFrame integer
+--- @field receivedDataInLastMessage integer
+--- @field sentUIMessageCount integer
+--- @field sentUIMessageCountPerSecond integer
+--- @field sentUIData integer
+--- @field sentUIDataPerSecond integer
+--- @field sentUIDataInFrame integer
+--- @field sentUIDataInLastMessage integer
+--- @field sentLuaMessageCount integer
+--- @field sentLuaMessageCountPerSecond integer
+--- @field sentLuaData integer
+--- @field sentLuaDataPerSecond integer
+--- @field sentLuaDataInFrame integer
+--- @field sentLuaDataInLastMessage integer
+--- @field sentMessageCount integer
+--- @field sentMessageCountPerSecond integer
+--- @field sentData integer
+--- @field sentDataPerSecond integer
+--- @field sentDataInFrame integer
+--- @field sentDataInLastMessage integer
+NetworkStat = {}
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Object)
+]]
 --- @class Object
---- @field s_id integer
 --- @field name string
 --- @field tag string
---- @field flags integer
---- @field transform2 integer
---- @field meshData integer
---- @field meshRender integer
---- @field voxelData integer
---- @field voxelRender integer
---- @field rigidBody integer
 --- @field id integer
 --- @field isDestroyed boolean
 --- @field componentsCount integer
@@ -1148,8 +1324,9 @@ MeshRender = {}
 --- @field dontSave boolean
 Object = {}
 
---- @return Object
-function Object() end
+--- @param p1 Object
+--- @return nil
+function Object:RemoveAllNonNativeComponents(p1) end
 
 --- @param p1 string
 --- @return userdata
@@ -1159,6 +1336,9 @@ function Object:AddComponent(p1) end
 --- @return userdata
 function Object:GetComponent(p1) end
 
+--- @return table
+function Object:GetComponents() end
+
 --- @param p1 string
 --- @return userdata
 function Object:RemoveComponent(p1) end
@@ -1167,17 +1347,23 @@ function Object:RemoveComponent(p1) end
 --- @return userdata
 function Object:GetComponentByType(p1) end
 
---- @param p1 Object
---- @return nil
-function Object:RemoveAllNonNativeComponents(p1) end
+--- @param p1 string
+--- @return table
+function Object:GetComponentsByType(p1) end
 
+--- @param p1 string
+--- @return ScriptComponent
+function Object:FindScriptComponentByName(p1) end
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Object3D)
+]]
 --- @class Object3D
 --- @field transformation Transformation
 Object3D = {}
-
---- @param p1 string
---- @return Object3D
-function Object3D(p1) end
 
 --- @param p1 Object3D
 --- @return Transformation
@@ -1199,10 +1385,6 @@ function Object3D:MoveRight(p1) end
 --- @return nil
 function Object3D:MoveUp(p1) end
 
---- @param p1 Object3D
---- @return Mat4
-function Object3D:GetLtw(p1) end
-
 --- @param p1 Vec3
 --- @return nil
 function Object3D:Rotate(p1) end
@@ -1220,6 +1402,10 @@ function Object3D:GetRight(p1) end
 function Object3D:GetUp(p1) end
 
 --- @param p1 Object3D
+--- @return Matrix4f
+function Object3D:GetLtw(p1) end
+
+--- @param p1 Object3D
 --- @return Vec3
 function Object3D:GetPosition(p1) end
 
@@ -1227,20 +1413,41 @@ function Object3D:GetPosition(p1) end
 --- @return nil
 function Object3D:SetPosition(p1) end
 
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/RealtimeLightingInfo)
+]]
 --- @class RealtimeLightingInfo
+--- @field directional boolean
+--- @field shadows boolean
+--- @field ambientOcclusion boolean
 --- @field diffuseSamples integer
+--- @field ambientColor Vec3
+--- @field diffuseColor Vec3
+--- @field lightDir Vec3
 --- @field ambientSamples integer
 --- @field diffuseRayLength number
 --- @field ambientRayLength number
 --- @field taskBoxScale integer
---- @field ambient Vec3
---- @field diffuse Vec3
---- @field lightDir Vec3
 RealtimeLightingInfo = {}
 
---- @return RealtimeLightingInfo
-function RealtimeLightingInfo() end
+--[[
+`Client`
+`Server`
 
+[View Documentation](https://docs.atomontage.com/api/ResResource)
+]]
+--- @class ResResource
+ResResource = {}
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Rotation)
+]]
 --- @class Rotation
 --- @field angles Vec3
 Rotation = {}
@@ -1252,19 +1459,14 @@ function Rotation() end
 --- @return Rotation
 function Rotation(p1) end
 
---- @return Rotation
-function Rotation() end
+--[[
+`Client`
+`Server`
 
---- @return Rotation
-function Rotation() end
-
+[View Documentation](https://docs.atomontage.com/api/Scene)
+]]
 --- @class Scene
---- @field SysTransform userdata
---- @field SysMeshRender MeshRender
---- @field SysMeshData MeshData
 --- @field lighting LightingUpdate
---- @field SysVoxelData userdata
---- @field SysVoxelRender userdata
 Scene = {}
 
 --- @return number
@@ -1273,11 +1475,18 @@ function Scene:GetTime() end
 --- @return number
 function Scene:GetTimeDelta() end
 
+--- @return number
+function Scene:GetDebugTime() end
+
 --- @return boolean
 function Scene:Test() end
 
 --- @return Object
 function Scene:CreateObject() end
+
+--- @param p1 Object
+--- @return Object
+function Scene:CloneObject(p1) end
 
 --- @param p1 Object
 --- @return nil
@@ -1304,21 +1513,22 @@ function Scene:GetRootObjects() end
 --- @return table
 function Scene:GetObjectsByTag(p1) end
 
---- @param p1 integer
---- @return Object
-function Scene:GetObjectById(p1) end
-
---- @param p1 string
---- @param p2 integer
---- @return userdata
-function Scene:GetNativeComponentById(p1, p2) end
-
 --- @return boolean
 function Scene:IsServerReady() end
 
---- @param p1 string
+--- @return boolean
+function Scene:GetAmFileLoaded() end
+
 --- @return nil
+function Scene:SetAmFileLoaded() end
+
+--- @param p1 string
+--- @return boolean
 function Scene:Save(p1) end
+
+--- @param p1 string
+--- @return integer
+function Scene:Merge(p1) end
 
 --- @param p1 string
 --- @return nil
@@ -1328,22 +1538,17 @@ function Scene:ScheduleLoad(p1) end
 function Scene:RebuildLighting() end
 
 --- @param p1 string
+--- @param p2 string
 --- @return LightingUpdate
-function Scene:CreateLighting(p1) end
+function Scene:CreateLighting(p1, p2) end
 
 --- @param p1 string
 --- @return VoxelDB
 function Scene:GetVoxelDB(p1) end
 
---- @param p1 Object
---- @return Object
-function Scene:CloneObject(p1) end
-
---- @param p1 string
---- @return integer
-function Scene:Merge(p1) end
-
 --[[
+`Client`
+`Server`
 
 See also: [Component](Component)
 
@@ -1407,29 +1612,131 @@ end
 --- @class ScriptComponent
 --- @field type string
 --- @field object Object
---- @field fileName string
 --- @field isValid boolean
 --- @field instance table
 --- @field file string
 ScriptComponent = {}
 
---- @return ScriptComponent
-function ScriptComponent() end
+--- @return boolean
+function ScriptComponent:GetSyncToClient() end
 
+--- @param p1 boolean
+--- @return nil
+function ScriptComponent:SetSyncToClient(p1) end
+
+--- @param p1 string
+--- @param p2 table
+--- @param p3 integer
+--- @return nil
+function ScriptComponent:SendMessage(p1, p2, p3) end
+
+--- @param p1 string
+--- @param p2 table
+--- @return nil
+function ScriptComponent:SendMessage(p1, p2) end
+
+--[[
+`Server`
+:::info Server Only
+This class is only available on server
+:::
+
+[View Documentation](https://docs.atomontage.com/api/Server)
+]]
+--- @class Server
+Server = {}
+
+--- @return table
+function Server:GetClients() end
+
+--- @param toClientID integer
+--- @param messages table
+--- @return nil
+function Server:SendMessages(toClientID, messages) end
+
+--- @return table
+function Server:ReceiveMessages() end
+
+--- @return integer
+function Server:GetScriptsVersion() end
+
+--- @return nil
+function Server:ResendScripts() end
+
+--- @return boolean
+function Server:ReloadScripts() end
+
+--- @return userdata
+function Server:GetVoxelClientIDs() end
+
+--- @param clientID integer
+--- @return AmStreamingStats
+function Server:GetVoxelStreamStats(clientID) end
+
+--- @return ServerConnectionInfo
+function Server:GetServerConnectionInfo() end
+
+--- @return userdata
+function Server:GetConnectionInfos() end
+
+--- @return NetworkStat
+function Server:GetNetworkStat() end
+
+--- @return userdata
+function Server:GetNetworkStats() end
+
+--- @return nil
+function Server:OnLuaLog() end
+
+--- @return boolean
+function Server:IsClient() end
+
+--- @return boolean
+function Server:IsServer() end
+
+--- @return integer
+function Server:GetCurrentUIActionID() end
+
+--- @return nil
+function Server:ScrollToLastestLuaLog() end
+
+--- @return CommandLine
+function Server:GetCommandLine() end
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/ServerConnectionInfo)
+]]
+--- @class ServerConnectionInfo
+--- @field networkState string
+--- @field name string
+--- @field IP string
+--- @field port integer
+--- @field streamingVersion string
+ServerConnectionInfo = {}
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Transform)
+]]
 --- @class Transform
 --- @field childCount integer
+--- @field pos Vec3
 --- @field rot Quat
+--- @field localPos Vec3
 --- @field localScale number
 --- @field localRot Quat
 --- @field parent Transform
 --- @field invalid Transform
---- @field type string
---- @field object Object
---- @field pos Vec3
---- @field localPos Vec3
 --- @field right Vec3
 --- @field up Vec3
 --- @field forward Vec3
+--- @field type string
+--- @field object Object
 Transform = {}
 
 --- @param p1 string
@@ -1456,52 +1763,33 @@ function Transform:LocalToWorldVec(p1) end
 --- @return Vec3
 function Transform:WorldToLocalVec(p1) end
 
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Transformation)
+]]
 --- @class Transformation
---- @field rotation Rotation
 --- @field position Vec3
+--- @field rotation Rotation
 Transformation = {}
 
 --- @return Transformation
 function Transformation() end
-
---- @return Transformation
-function Transformation() end
-
---- @param p1 structAsObject
---- @return Transformation
-function Transformation(p1) end
-
---- @return Transformation
-function Transformation() end
-
---- @param p1 structAsObject
---- @return Transformation
-function Transformation(p1) end
-
---- @return Transformation
-function Transformation() end
-
---- @return Transformation
-function Transformation() end
-
---- @param p1 structAsObject
---- @return Transformation
-function Transformation(p1) end
 
 --- @param p1 Rotation
 --- @param p2 Vec3
 --- @return Transformation
 function Transformation(p1, p2) end
 
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/UIItem)
+]]
 --- @class UIItem
 UIItem = {}
-
---- @return UIItem
-function UIItem() end
-
---- @param p1 string
---- @return UIItem
-function UIItem(p1) end
 
 --- @return string
 function UIItem:GetID() end
@@ -1512,6 +1800,12 @@ function UIItem:GetType() end
 --- @return string
 function UIItem:GetLabel() end
 
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Vec2)
+]]
 --- @class Vec2
 --- @field x number
 --- @field y number
@@ -1531,179 +1825,6 @@ function Vec2(p1, p2) end
 --- @param p1 number
 --- @return Vec2
 function Vec2(p1) end
-
---- @return Vec2
-function Vec2() end
-
---- @param p1 structAsObject
---- @return Vec2
-function Vec2(p1) end
-
---- @param p1 structAsRawPointegerer
---- @return Vec2
-function Vec2(p1) end
-
---- @return Vec2
-function Vec2() end
-
---- @param p1 structAsObject
---- @return Vec2
-function Vec2(p1) end
-
---- @param p1 structAsRawPointegerer
---- @return Vec2
-function Vec2(p1) end
-
---- @param p1 Vec2
---- @param p2 number
---- @return Vec2
-function Vec2:__mul(p1, p2) end
-
---- @param p1 number
---- @param p2 Vec2
---- @return Vec2
-function Vec2:__mul(p1, p2) end
-
---- @param p1 Vec2
---- @param p2 Vec2
---- @return Vec2
-function Vec2:__mul(p1, p2) end
-
---- @param p1 Vec2
---- @param p2 number
---- @return Vec2
-function Vec2:__div(p1, p2) end
-
---- @param p1 Vec2
---- @param p2 Vec2
---- @return Vec2
-function Vec2:__div(p1, p2) end
-
---- @param p1 Vec2
---- @param p2 Vec2
---- @return Vec2
-function Vec2:__add(p1, p2) end
-
---- @param p1 Vec2
---- @param p2 Vec2
---- @return Vec2
-function Vec2:__sub(p1, p2) end
-
---- @param p1 Vec2
---- @param p2 Vec2
---- @return Vec2
-function Vec2:__unm(p1, p2) end
-
---- @param p1 Vec2
---- @param p2 Vec2
---- @return number
-function Vec2:Dot(p1, p2) end
-
---- @param p1 Vec2
---- @return boolean
-function Vec2:IsZero(p1) end
-
---- @return number
-function Vec2:Length() end
-
---- @return number
-function Vec2:SqrLength() end
-
---- @return Angle
-function Vec2:GetAngle() end
-
---- @return number
-function Vec2:GetAngleRad() end
-
---- @return nil
-function Vec2:Normalize() end
-
---- @param p1 number
---- @return nil
-function Vec2:NormalizeTo(p1) end
-
---- @return Vec2
-function Vec2:GetNormalized() end
-
---- @param p1 number
---- @return Vec2
-function Vec2:GetNormalizedTo(p1) end
-
---- @param p1 Vec2
---- @param p2 number
---- @return nil
-function Vec2:MorphTo(p1, p2) end
-
---- @param p1 Vec2
---- @param p2 number
---- @return Vec2
-function Vec2:GetMorphedTo(p1, p2) end
-
---- @return nil
-function Vec2:RotateRight90() end
-
---- @param p1 Angle
---- @return nil
-function Vec2:RotateRight(p1) end
-
---- @param p1 number
---- @return nil
-function Vec2:RotateRight(p1) end
-
---- @param p1 Angle
---- @return Vec2
-function Vec2:GetRotatedRight(p1) end
-
---- @param p1 number
---- @return Vec2
-function Vec2:GetRotatedRight(p1) end
-
---- @return Vec2
-function Vec2:GetRotatedRight90() end
-
---- @return nil
-function Vec2:RotateLeft90() end
-
---- @param p1 Angle
---- @return nil
-function Vec2:RotateLeft(p1) end
-
---- @param p1 number
---- @return nil
-function Vec2:RotateLeft(p1) end
-
---- @param p1 Angle
---- @return Vec2
-function Vec2:GetRotatedLeft(p1) end
-
---- @param p1 number
---- @return Vec2
-function Vec2:GetRotatedLeft(p1) end
-
---- @return Vec2
-function Vec2:GetRotatedLeft90() end
-
---- @return nil
-function Vec2:Rotate90() end
-
---- @param p1 Angle
---- @return nil
-function Vec2:Rotate(p1) end
-
---- @param p1 number
---- @return nil
-function Vec2:Rotate(p1) end
-
---- @param p1 Angle
---- @return Vec2
-function Vec2:GetRotated(p1) end
-
---- @param p1 number
---- @return Vec2
-function Vec2:GetRotated(p1) end
-
---- @return Vec2
-function Vec2:GetRotated90() end
 
 --- @param p1 Vec2
 --- @return Vec2
@@ -1730,7 +1851,32 @@ function Vec2:__newindex(p1, p2, p3) end
 function Vec2:__mul(p1, p2) end
 
 --- @param p1 Vec2
+--- @param p2 number
+--- @return Vec2
+function Vec2:__mul(p1, p2) end
+
+--- @param p1 number
+--- @param p2 Vec2
+--- @return Vec2
+function Vec2:__mul(p1, p2) end
+
+--- @param p1 Vec2
+--- @param p2 Vec2
+--- @return Vec2
+function Vec2:__mul(p1, p2) end
+
+--- @param p1 Vec2
 --- @param p2 Vec2i
+--- @return Vec2
+function Vec2:__div(p1, p2) end
+
+--- @param p1 Vec2
+--- @param p2 number
+--- @return Vec2
+function Vec2:__div(p1, p2) end
+
+--- @param p1 Vec2
+--- @param p2 Vec2
 --- @return Vec2
 function Vec2:__div(p1, p2) end
 
@@ -1740,9 +1886,24 @@ function Vec2:__div(p1, p2) end
 function Vec2:__add(p1, p2) end
 
 --- @param p1 Vec2
+--- @param p2 Vec2
+--- @return Vec2
+function Vec2:__add(p1, p2) end
+
+--- @param p1 Vec2
 --- @param p2 Vec2i
 --- @return Vec2
 function Vec2:__sub(p1, p2) end
+
+--- @param p1 Vec2
+--- @param p2 Vec2
+--- @return Vec2
+function Vec2:__sub(p1, p2) end
+
+--- @param p1 Vec2
+--- @param p2 Vec2
+--- @return Vec2
+function Vec2:__unm(p1, p2) end
 
 --- @param p1 Vec2
 --- @param p2 Vec2i
@@ -1834,6 +1995,11 @@ function Vec2:SetAbs() end
 function Vec2:Dot(p1, p2) end
 
 --- @param p1 Vec2
+--- @param p2 Vec2
+--- @return number
+function Vec2:Dot(p1, p2) end
+
+--- @param p1 Vec2
 --- @param p2 Vec2i
 --- @return Vec3
 function Vec2:Cross(p1, p2) end
@@ -1854,6 +2020,36 @@ function Vec2:Lerp(p1, p2, p3) end
 --- @param p3 number
 --- @return Vec2
 function Vec2:Mix(p1, p2, p3) end
+
+--- @param p1 Vec2
+--- @return boolean
+function Vec2:IsZero(p1) end
+
+--- @return number
+function Vec2:Length() end
+
+--- @return number
+function Vec2:SqrLength() end
+
+--- @return Angle
+function Vec2:GetAngle() end
+
+--- @return number
+function Vec2:GetAngleRad() end
+
+--- @return nil
+function Vec2:Normalize() end
+
+--- @param p1 number
+--- @return nil
+function Vec2:NormalizeTo(p1) end
+
+--- @return Vec2
+function Vec2:GetNormalized() end
+
+--- @param p1 number
+--- @return Vec2
+function Vec2:GetNormalizedTo(p1) end
 
 --- @param p1 Vec2
 --- @param p2 Vec2
@@ -1912,6 +2108,88 @@ function Vec2:SetLength(p1, p2) end
 --- @return number
 function Vec2:DistanceTo(p1, p2) end
 
+--- @param p1 Vec2
+--- @param p2 number
+--- @return nil
+function Vec2:MorphTo(p1, p2) end
+
+--- @param p1 Vec2
+--- @param p2 number
+--- @return Vec2
+function Vec2:GetMorphedTo(p1, p2) end
+
+--- @return nil
+function Vec2:RotateRight90() end
+
+--- @param p1 Angle
+--- @return nil
+function Vec2:RotateRight(p1) end
+
+--- @param p1 number
+--- @return nil
+function Vec2:RotateRight(p1) end
+
+--- @param p1 Angle
+--- @return Vec2
+function Vec2:GetRotatedRight(p1) end
+
+--- @param p1 number
+--- @return Vec2
+function Vec2:GetRotatedRight(p1) end
+
+--- @return Vec2
+function Vec2:GetRotatedRight90() end
+
+--- @return nil
+function Vec2:RotateLeft90() end
+
+--- @param p1 Angle
+--- @return nil
+function Vec2:RotateLeft(p1) end
+
+--- @param p1 number
+--- @return nil
+function Vec2:RotateLeft(p1) end
+
+--- @param p1 Angle
+--- @return Vec2
+function Vec2:GetRotatedLeft(p1) end
+
+--- @param p1 number
+--- @return Vec2
+function Vec2:GetRotatedLeft(p1) end
+
+--- @return Vec2
+function Vec2:GetRotatedLeft90() end
+
+--- @return nil
+function Vec2:Rotate90() end
+
+--- @param p1 Angle
+--- @return nil
+function Vec2:Rotate(p1) end
+
+--- @param p1 number
+--- @return nil
+function Vec2:Rotate(p1) end
+
+--- @param p1 Angle
+--- @return Vec2
+function Vec2:GetRotated(p1) end
+
+--- @param p1 number
+--- @return Vec2
+function Vec2:GetRotated(p1) end
+
+--- @return Vec2
+function Vec2:GetRotated90() end
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Vec2i)
+]]
 --- @class Vec2i
 --- @field x integer
 --- @field y integer
@@ -1933,28 +2211,6 @@ function Vec2i(p1, p2) end
 function Vec2i(p1) end
 
 --- @param p1 Vec2i
---- @return Vec2i
-function Vec2i(p1) end
-
---- @return Vec2i
-function Vec2i() end
-
---- @param p1 structAsObject
---- @return Vec2i
-function Vec2i(p1) end
-
---- @param p1 structAsRawPointegerer
---- @return Vec2i
-function Vec2i(p1) end
-
---- @return Vec2i
-function Vec2i() end
-
---- @param p1 structAsObject
---- @return Vec2i
-function Vec2i(p1) end
-
---- @param p1 structAsRawPointegerer
 --- @return Vec2i
 function Vec2i(p1) end
 
@@ -2355,6 +2611,8 @@ function Vec2i:GetRotated(p1, p2) end
 function Vec2i:GetRotated90() end
 
 --[[
+`Client`
+`Server`
 
 Representation of 3D vectors and points.
 
@@ -2378,36 +2636,20 @@ This action is dangerous
 --- @field x number
 --- @field y number
 --- @field z number
---- @field length number
 --- @field zero Vec3
 --- @field up Vec3
 --- @field right Vec3
 --- @field forward Vec3
---- @field normalized Vec3
 --- @field down Vec3
 --- @field left Vec3
 --- @field back Vec3
+--- @field length number
+--- @field normalized Vec3
 Vec3 = {}
 
---[[
-Returns Vec3(0, 0, 0).
-
-```lua
-local vec = Vec3()
-```
-
-[View Documentation](https://docs.atomontage.com/api/Vec3#Vec3)
-]]
 --- @return Vec3
 function Vec3() end
 
---[[
-```lua
-local vec = Vec3(0.5, 10, 33.33)
-```
-
-[View Documentation](https://docs.atomontage.com/api/Vec3#Vec3-float-float-float)
-]]
 --- @param p1 number
 --- @param p2 number
 --- @param p3 number
@@ -2424,133 +2666,6 @@ function Vec3(p1, p2, p3) end
 --- @return Vec3
 function Vec3(p1) end
 
---- @return Vec3
-function Vec3() end
-
---- @return Vec3
-function Vec3() end
-
---[[
-Metamethod overload to multiply vec3 with float number 
-```lua
-local vec = Vec3(0, 10, 0)
-local res = vec * 3 --res is Vec3(0, 30, 0)
-```
-
-[View Documentation](https://docs.atomontage.com/api/Vec3#Vec3-mul-Vec3-float)
-]]
---- @param p1 Vec3
---- @param p2 number
---- @return Vec3
-function Vec3:__mul(p1, p2) end
-
---- @param p1 number
---- @param p2 Vec3
---- @return Vec3
-function Vec3:__mul(p1, p2) end
-
---- @param p1 Vec3
---- @param p2 Vec3
---- @return Vec3
-function Vec3:__mul(p1, p2) end
-
---- @param p1 Vec3
---- @param p2 number
---- @return Vec3
-function Vec3:__div(p1, p2) end
-
---- @param p1 Vec3
---- @param p2 Vec3
---- @return Vec3
-function Vec3:__div(p1, p2) end
-
---- @param p1 Vec3
---- @param p2 Vec3
---- @return Vec3
-function Vec3:__add(p1, p2) end
-
---- @param p1 Vec3
---- @param p2 Vec3
---- @return Vec3
-function Vec3:__sub(p1, p2) end
-
---- @param p1 Vec3
---- @param p2 Vec3
---- @return Vec3
-function Vec3:__unm(p1, p2) end
-
---- @param p1 Vec3
---- @param p2 Vec3
---- @return number
-function Vec3:Dot(p1, p2) end
-
---- @param p1 Vec3
---- @param p2 Vec3
---- @param p3 number
---- @return Vec3
-function Vec3:Lerp(p1, p2, p3) end
-
---- @param p1 Vec3
---- @param p2 Vec3
---- @param p3 number
---- @return Vec3
-function Vec3:Mix(p1, p2, p3) end
-
---- @param p1 Vec3
---- @param p2 number
---- @param p3 number
---- @return nil
-function Vec3:Clamp(p1, p2, p3) end
-
---- @param p1 Vec3
---- @param p2 number
---- @param p3 number
---- @return Vec3
-function Vec3:GetClamped(p1, p2, p3) end
-
---- @param p1 Vec3
---- @return nil
-function Vec3:Ceil(p1) end
-
---- @param p1 Vec3
---- @return Vec3
-function Vec3:GetCeiled(p1) end
-
---- @param p1 Vec3
---- @return nil
-function Vec3:Floor(p1) end
-
---- @param p1 Vec3
---- @return Vec3
-function Vec3:GetFloored(p1) end
-
---- @param p1 Vec3
---- @return nil
-function Vec3:Round(p1) end
-
---- @param p1 Vec3
---- @return Vec3
-function Vec3:GetRounded(p1) end
-
---- @param p1 Vec3
---- @param p2 number
---- @return nil
-function Vec3:SetLength(p1, p2) end
-
---- @param p1 Vec3
---- @param p2 Vec3
---- @return number
-function Vec3:Length(p1, p2) end
-
---- @param p1 Vec3
---- @return number
-function Vec3:Length(p1) end
-
---- @param p1 Mat4
---- @param p2 Vec3
---- @return Vec4
-function Vec3:__mul(p1, p2) end
-
 --- @param p1 Vec3
 --- @return Vec3
 function Vec3(p1) end
@@ -2563,22 +2678,6 @@ function Vec3(p1) end
 --- @param p2 number
 --- @return Vec3
 function Vec3(p1, p2) end
-
---- @param p1 structAsObject
---- @return Vec3
-function Vec3(p1) end
-
---- @param p1 structAsRawPointegerer
---- @return Vec3
-function Vec3(p1) end
-
---- @param p1 structAsObject
---- @return Vec3
-function Vec3(p1) end
-
---- @param p1 structAsRawPointegerer
---- @return Vec3
-function Vec3(p1) end
 
 --- @param p1 Vec3
 --- @param p2 integer
@@ -2602,7 +2701,37 @@ function Vec3:__mul(p1, p2) end
 function Vec3:__mul(p1, p2) end
 
 --- @param p1 Vec3
+--- @param p2 Matrix4f
+--- @return Vec4
+function Vec3:__mul(p1, p2) end
+
+--- @param p1 Vec3
+--- @param p2 number
+--- @return Vec3
+function Vec3:__mul(p1, p2) end
+
+--- @param p1 number
+--- @param p2 Vec3
+--- @return Vec3
+function Vec3:__mul(p1, p2) end
+
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @return Vec3
+function Vec3:__mul(p1, p2) end
+
+--- @param p1 Vec3
 --- @param p2 Vec3i
+--- @return Vec3
+function Vec3:__div(p1, p2) end
+
+--- @param p1 Vec3
+--- @param p2 number
+--- @return Vec3
+function Vec3:__div(p1, p2) end
+
+--- @param p1 Vec3
+--- @param p2 Vec3
 --- @return Vec3
 function Vec3:__div(p1, p2) end
 
@@ -2612,9 +2741,24 @@ function Vec3:__div(p1, p2) end
 function Vec3:__add(p1, p2) end
 
 --- @param p1 Vec3
+--- @param p2 Vec3
+--- @return Vec3
+function Vec3:__add(p1, p2) end
+
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @return Vec3
+function Vec3:__sub(p1, p2) end
+
+--- @param p1 Vec3
 --- @param p2 Vec3i
 --- @return Vec3
 function Vec3:__sub(p1, p2) end
+
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @return Vec3
+function Vec3:__unm(p1, p2) end
 
 --- @param p1 Vec3
 --- @param p2 Vec3i
@@ -2760,6 +2904,11 @@ function Vec3:SetAbs() end
 function Vec3:Dot(p1, p2) end
 
 --- @param p1 Vec3
+--- @param p2 Vec3
+--- @return number
+function Vec3:Dot(p1, p2) end
+
+--- @param p1 Vec3
 --- @param p2 Vec3i
 --- @return Vec3
 function Vec3:Cross(p1, p2) end
@@ -2768,6 +2917,18 @@ function Vec3:Cross(p1, p2) end
 --- @param p2 Vec3
 --- @return Vec3
 function Vec3:Cross(p1, p2) end
+
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @param p3 number
+--- @return Vec3
+function Vec3:Lerp(p1, p2, p3) end
+
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @param p3 number
+--- @return Vec3
+function Vec3:Mix(p1, p2, p3) end
 
 --- @return Vec3
 function Vec3:Normalize() end
@@ -2780,6 +2941,18 @@ function Vec3:GetNormalized() end
 
 --- @return Vec3
 function Vec3:GetNormalizedSafe() end
+
+--- @param p1 Vec3
+--- @param p2 number
+--- @param p3 number
+--- @return nil
+function Vec3:Clamp(p1, p2, p3) end
+
+--- @param p1 Vec3
+--- @param p2 number
+--- @param p3 number
+--- @return Vec3
+function Vec3:GetClamped(p1, p2, p3) end
 
 --- @param p1 number
 --- @return Vec3
@@ -2804,6 +2977,44 @@ function Vec3:SignsUnitsi32() end
 function Vec3:GetVec3i() end
 
 --- @param p1 Vec3
+--- @return nil
+function Vec3:Ceil(p1) end
+
+--- @param p1 Vec3
+--- @return Vec3
+function Vec3:GetCeiled(p1) end
+
+--- @param p1 Vec3
+--- @return nil
+function Vec3:Floor(p1) end
+
+--- @param p1 Vec3
+--- @return Vec3
+function Vec3:GetFloored(p1) end
+
+--- @param p1 Vec3
+--- @return nil
+function Vec3:Round(p1) end
+
+--- @param p1 Vec3
+--- @return Vec3
+function Vec3:GetRounded(p1) end
+
+--- @param p1 Vec3
+--- @param p2 number
+--- @return nil
+function Vec3:SetLength(p1, p2) end
+
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @return number
+function Vec3:Length(p1, p2) end
+
+--- @param p1 Vec3
+--- @return number
+function Vec3:Length(p1) end
+
+--- @param p1 Vec3
 --- @return Vec3
 function Vec3:IsNaN(p1) end
 
@@ -2816,6 +3027,12 @@ function Vec3:IsZero(p1) end
 --- @return number
 function Vec3:DistanceTo(p1, p2) end
 
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Vec3i)
+]]
 --- @class Vec3i
 --- @field x integer
 --- @field y integer
@@ -2849,28 +3066,6 @@ function Vec3i(p1) end
 function Vec3i(p1) end
 
 --- @param p1 Vec3i
---- @return Vec3i
-function Vec3i(p1) end
-
---- @return Vec3i
-function Vec3i() end
-
---- @param p1 structAsObject
---- @return Vec3i
-function Vec3i(p1) end
-
---- @param p1 structAsRawPointegerer
---- @return Vec3i
-function Vec3i(p1) end
-
---- @return Vec3i
-function Vec3i() end
-
---- @param p1 structAsObject
---- @return Vec3i
-function Vec3i(p1) end
-
---- @param p1 structAsRawPointegerer
 --- @return Vec3i
 function Vec3i(p1) end
 
@@ -3285,6 +3480,12 @@ function Vec3i:Length(p1, p2) end
 --- @return number
 function Vec3i:Length(p1) end
 
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Vec4)
+]]
 --- @class Vec4
 --- @field x number
 --- @field y number
@@ -3316,14 +3517,39 @@ function Vec4(p1, p2, p3, p4) end
 --- @return Vec4
 function Vec4(p1) end
 
+--- @param p1 Vec4
 --- @return Vec4
-function Vec4() end
+function Vec4(p1) end
 
+--- @param p1 Vec2
+--- @param p2 number
+--- @param p3 number
 --- @return Vec4
-function Vec4() end
+function Vec4(p1, p2, p3) end
 
---- @param p1 Mat4
---- @param p2 Vec4
+--- @param p1 Vec3
+--- @param p2 number
+--- @return Vec4
+function Vec4(p1, p2) end
+
+--- @param p1 Vec4
+--- @param p2 integer
+--- @return number
+function Vec4:__index(p1, p2) end
+
+--- @param p1 Vec4
+--- @param p2 integer
+--- @param p3 number
+--- @return nil
+function Vec4:__newindex(p1, p2, p3) end
+
+--- @param p1 Vec4
+--- @param p2 Quat
+--- @return Vec4
+function Vec4:__mul(p1, p2) end
+
+--- @param p1 Vec4
+--- @param p2 Matrix4f
 --- @return Vec4
 function Vec4:__mul(p1, p2) end
 
@@ -3366,53 +3592,6 @@ function Vec4:__sub(p1, p2) end
 --- @param p2 Vec4
 --- @return Vec4
 function Vec4:__unm(p1, p2) end
-
---- @param p1 Vec4
---- @return Vec4
-function Vec4(p1) end
-
---- @param p1 Vec2
---- @param p2 number
---- @param p3 number
---- @return Vec4
-function Vec4(p1, p2, p3) end
-
---- @param p1 Vec3
---- @param p2 number
---- @return Vec4
-function Vec4(p1, p2) end
-
---- @param p1 structAsObject
---- @return Vec4
-function Vec4(p1) end
-
---- @param p1 structAsRawPointegerer
---- @return Vec4
-function Vec4(p1) end
-
---- @param p1 structAsObject
---- @return Vec4
-function Vec4(p1) end
-
---- @param p1 structAsRawPointegerer
---- @return Vec4
-function Vec4(p1) end
-
---- @param p1 Vec4
---- @param p2 integer
---- @return number
-function Vec4:__index(p1, p2) end
-
---- @param p1 Vec4
---- @param p2 integer
---- @param p3 number
---- @return nil
-function Vec4:__newindex(p1, p2, p3) end
-
---- @param p1 Vec4
---- @param p2 Quat
---- @return Vec4
-function Vec4:__mul(p1, p2) end
 
 --- @param p1 Vec4
 --- @param p2 Vec4
@@ -3590,13 +3769,16 @@ function Vec4:IsZero(p1) end
 --- @return number
 function Vec4:DistanceTo(p1, p2) end
 
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/VoxelDB)
+]]
 --- @class VoxelDB
 --- @field autoLightingUpdate boolean
 --- @field voxelDim integer
 VoxelDB = {}
-
---- @return VoxelDB
-function VoxelDB() end
 
 --- @return nil
 function VoxelDB:Clear() end
@@ -3611,22 +3793,115 @@ function VoxelDB:Flush() end
 --- @return integer
 function VoxelDB:FromWorld(p1) end
 
+--- @param p1 Vec3
+--- @return Vec3i
+function VoxelDB:FromWorld(p1) end
+
 --- @param p1 number
 --- @return number
 function VoxelDB:ToWorld(p1) end
 
 --- @param p1 Vec3i
+--- @return Vec3
+function VoxelDB:ToWorld(p1) end
+
+--- @param p1 boolean
+--- @return boolean
+function VoxelDB:SetUnitVoxelDim(p1) end
+
+--- @param p1 Vec3i
 --- @param p2 boolean
 --- @return nil
-function VoxelDB:SetMask(p1, p2) end
+function VoxelDB:SetMask_deprecated(p1, p2) end
+
+--- @param p1 number
+--- @param p2 number
+--- @param p3 number
+--- @return boolean
+function VoxelDB:GetMask(p1, p2, p3) end
 
 --- @param p1 Vec3i
 --- @return boolean
 function VoxelDB:GetMask(p1) end
 
+--- @param p1 number
+--- @param p2 number
+--- @param p3 number
+--- @param p4 integer
+--- @return integer
+function VoxelDB:GetMaskNeighbours(p1, p2, p3, p4) end
+
+--- @param p1 Vec3i
+--- @param p2 integer
+--- @return integer
+function VoxelDB:GetMaskNeighbours(p1, p2) end
+
+--- @param p1 number
+--- @param p2 number
+--- @param p3 number
+--- @param p4 integer
+--- @return integer
+function VoxelDB:GetMaskNeighboursVN(p1, p2, p3, p4) end
+
+--- @param p1 Vec3i
+--- @param p2 integer
+--- @return integer
+function VoxelDB:GetMaskNeighboursVN(p1, p2) end
+
+--- @param p1 number
+--- @param p2 number
+--- @param p3 number
+--- @return nil
+function VoxelDB:ClearVoxel(p1, p2, p3) end
+
+--- @param p1 Vec3i
+--- @return nil
+function VoxelDB:ClearVoxel(p1) end
+
+--- @param p1 number
+--- @param p2 number
+--- @param p3 number
+--- @param p4 Vec3
+--- @return nil
+function VoxelDB:SetColor(p1, p2, p3, p4) end
+
+--- @param p1 Vec3i
+--- @param p2 Vec3
+--- @return nil
+function VoxelDB:SetColor(p1, p2) end
+
 --- @param p1 Vec3i
 --- @return userdata
 function VoxelDB:GetColor(p1) end
+
+--- @param p1 Vec3i
+--- @return Vec3
+function VoxelDB:GetNormal(p1) end
+
+--- @param p1 Vec3i
+--- @return Vec3
+function VoxelDB:GetFilteredNormal(p1) end
+
+--- @param p1 Vec3i
+--- @param p2 Vec3
+--- @param p3 number
+--- @return userdata
+function VoxelDB:TraceRay(p1, p2, p3) end
+
+--- @param p1 Vec3i
+--- @param p2 integer
+--- @param p3 Vec3
+--- @return nil
+function VoxelDB:PaintSphere(p1, p2, p3) end
+
+--- @param p1 Vec3i
+--- @param p2 integer
+--- @param p3 Vec3
+--- @param p4 number
+--- @param p5 number
+--- @param p6 number
+--- @return nil
+function VoxelDB:PaintSphereBlend(p1, p2, p3, p4, p5, p6) end
 
 --- @param p1 integer
 --- @param p2 Vec3i
@@ -3646,6 +3921,24 @@ function VoxelDB:ClearSphere(p1, p2) end
 --- @param p5 number
 --- @return nil
 function VoxelDB:InflateRadius(p1, p2, p3, p4, p5) end
+
+--- @param p1 Vec3i
+--- @param p2 integer
+--- @param p3 Vec3
+--- @return nil
+function VoxelDB:MakeSphere(p1, p2, p3) end
+
+--- @param p1 Vec3
+--- @param p2 Quat
+--- @param p3 number
+--- @return nil
+function VoxelDB:InstantiateIE(p1, p2, p3) end
+
+--- @param p1 Vec3i
+--- @param p2 Vec3
+--- @param p3 number
+--- @return userdata
+function VoxelDB:TraceRayTmp(p1, p2, p3) end
 
 --- @param p1 integer
 --- @return nil
@@ -3708,85 +4001,229 @@ function VoxelDB:Inspect(p1, p2, p3, p4, p5) end
 --- @return string
 function VoxelDB:GetLayers() end
 
---- @param p1 Vec3
---- @return Vec3i
-function VoxelDB:FromWorld(p1) end
+--[[
+`Client`
+`Server`
 
---- @param p1 Vec3i
---- @return Vec3
-function VoxelDB:ToWorld(p1) end
-
---- @param p1 Vec3i
---- @param p2 Vec3
---- @return nil
-function VoxelDB:SetColor(p1, p2) end
-
---- @param p1 Vec3i
---- @return Vec3
-function VoxelDB:GetNormal(p1) end
-
---- @param p1 Vec3i
---- @return Vec3
-function VoxelDB:GetFilteredNormal(p1) end
-
---- @param p1 Vec3i
---- @param p2 Vec3
---- @param p3 number
---- @return userdata
-function VoxelDB:TraceRay(p1, p2, p3) end
-
---- @param p1 Vec3i
---- @param p2 integer
---- @param p3 Vec3
---- @return nil
-function VoxelDB:PaintSphere(p1, p2, p3) end
-
---- @param p1 Vec3i
---- @param p2 integer
---- @param p3 Vec3
---- @param p4 number
---- @param p5 number
---- @param p6 number
---- @return nil
-function VoxelDB:PaintSphereBlend(p1, p2, p3, p4, p5, p6) end
-
---- @param p1 Vec3i
---- @param p2 integer
---- @param p3 Vec3
---- @return nil
-function VoxelDB:MakeSphere(p1, p2, p3) end
-
---- @param p1 Vec3
---- @param p2 Quat
---- @param p3 number
---- @return nil
-function VoxelDB:InstantiateIE(p1, p2, p3) end
-
---- @param p1 Vec3i
---- @param p2 Vec3
---- @param p3 number
---- @return userdata
-function VoxelDB:TraceRayTmp(p1, p2, p3) end
-
+[View Documentation](https://docs.atomontage.com/api/VoxelData)
+]]
 --- @class VoxelData
 --- @field resource string
 --- @field type string
 --- @field object Object
 VoxelData = {}
 
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/VoxelInspectData)
+]]
 --- @class VoxelInspectData
 --- @field voxelSize number
 --- @field texts string
 --- @field positions userdata
+--- @field colors userdata
 VoxelInspectData = {}
 
---- @return VoxelInspectData
-function VoxelInspectData() end
+--[[
+`Client`
+`Server`
 
+[View Documentation](https://docs.atomontage.com/api/VoxelRender)
+]]
 --- @class VoxelRender
 --- @field type string
 --- @field object Object
 VoxelRender = {}
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Quat)
+]]
+--- @class Quat
+--- @field x number
+--- @field y number
+--- @field z number
+--- @field w number
+--- @field identity Quat
+--- @field euler Vec3
+--- @field mat3 Matrix3f
+--- @field mat4 Matrix4f
+--- @field angle number
+--- @field axis Vec3
+--- @field conjugate Quat
+--- @field inverse Quat
+--- @field length number
+--- @field normalized Quat
+--- @field pitch number
+--- @field yaw number
+--- @field roll number
+Quat = {}
+
+--[[
+asdasdasdasdasd
+
+[View Documentation](https://docs.atomontage.com/api/Quat#Quat)
+]]
+--- @return Quat
+function Quat() end
+
+--- @param p1 number
+--- @param p2 number
+--- @param p3 number
+--- @param p4 number
+--- @return Quat
+function Quat(p1, p2, p3, p4) end
+
+--- @param p1 Vec3
+--- @return Quat
+function Quat(p1) end
+
+--- @param p1 Quat
+--- @return Quat
+function Quat(p1) end
+
+--- @param p1 number
+--- @param p2 Vec3
+--- @return Quat
+function Quat(p1, p2) end
+
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @return Quat
+function Quat(p1, p2) end
+
+--[[
+dddd
+
+[View Documentation](https://docs.atomontage.com/api/Quat#float-index-Vec3-int)
+]]
+--- @param p1 Vec3
+--- @param p2 integer
+--- @return number
+function Quat:__index(p1, p2) end
+
+--- @param p1 Vec3
+--- @param p2 integer
+--- @param p3 number
+--- @return nil
+function Quat:__newindex(p1, p2, p3) end
+
+--- @param p1 Quat
+--- @param p2 Quat
+--- @return Quat
+function Quat:__add(p1, p2) end
+
+--- @param p1 Quat
+--- @param p2 Quat
+--- @return Quat
+function Quat:__sub(p1, p2) end
+
+--- @param p1 number
+--- @param p2 Quat
+--- @return Quat
+function Quat:__mul(p1, p2) end
+
+--- @param p1 Quat
+--- @param p2 number
+--- @return Quat
+function Quat:__mul(p1, p2) end
+
+--- @param p1 Quat
+--- @param p2 Vec4
+--- @return Vec4
+function Quat:__mul(p1, p2) end
+
+--- @param p1 Quat
+--- @param p2 Vec3
+--- @return Vec3
+function Quat:__mul(p1, p2) end
+
+--- @param p1 Quat
+--- @param p2 Quat
+--- @return Quat
+function Quat:__mul(p1, p2) end
+
+--- @param p1 Quat
+--- @param p2 number
+--- @return Quat
+function Quat:__div(p1, p2) end
+
+--- @param p1 Quat
+--- @param p2 Quat
+--- @return Quat
+function Quat:__unm(p1, p2) end
+
+--- @param p1 Quat
+--- @param p2 Quat
+--- @return boolean
+function Quat:__eq(p1, p2) end
+
+--- @param p1 Vec3
+--- @return Quat
+function Quat:Euler(p1) end
+
+--- @param p1 number
+--- @param p2 Vec3
+--- @return Quat
+function Quat:AngleAxis(p1, p2) end
+
+--- @param p1 Quat
+--- @return number
+function Quat:Dot(p1) end
+
+--- @param p1 Quat
+--- @param p2 Quat
+--- @param p3 number
+--- @return Quat
+function Quat:Lerp(p1, p2, p3) end
+
+--- @param p1 Quat
+--- @param p2 Quat
+--- @param p3 number
+--- @return Quat
+function Quat:Mix(p1, p2, p3) end
+
+--- @return nil
+function Quat:Normalize() end
+
+--- @param p1 Quat
+--- @param p2 Quat
+--- @param p3 number
+--- @return Quat
+function Quat:Slerp(p1, p2, p3) end
+
+--- @param p1 number
+--- @param p2 Vec3
+--- @return nil
+function Quat:Rotate(p1, p2) end
+
+--- @param p1 number
+--- @param p2 Vec3
+--- @return Quat
+function Quat:GetRotated(p1, p2) end
+
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @return Quat
+function Quat:LookAt(p1, p2) end
+
+--- @param p1 Vec3
+--- @return Quat
+function Quat:LookAt(p1) end
+
+--- @return nil
+function Quat:Invert() end
+
+--- @return Quat
+function Quat:GetInversed() end
+
+--- @param p1 Quat
+--- @return number
+function Quat:DotProd(p1) end
 
 --- @class AttachmentFlags
 AttachmentFlags = {
@@ -3889,22 +4326,6 @@ LuaErrorType = {
 	UIAction = 3,
 }
 
---- @class MemTarget
-MemTarget = {
-	SystemMem = 0,
-	VideoMem = 1,
-}
-
---- @class MessageLevel
-MessageLevel = {
-	Critical = 0,
-	Error = 1,
-	Warn = 2,
-	Info = 3,
-	Debug = 4,
-	Trace = 5,
-}
-
 --- @class Operation
 Operation = {
 	Keep = 0,
@@ -3977,80 +4398,6 @@ PrimitiveTopology = {
 	TriangleStrip = 3,
 	TriangleFan = 4,
 	Triangles = 5,
-}
-
---- @class RTXShaderGroupType
-RTXShaderGroupType = {
-	General = 0,
-	TrianglesHitGroup = 1,
-	ProceduralHitGroup = 2,
-}
-
---- @class RenderTargetAttachmentLayout
-RenderTargetAttachmentLayout = {
-	Undefined = 0,
-	General = 1,
-	ColorAttachmentOptimal = 2,
-	DepthStencilAttachmentOptimal = 3,
-	DepthStencilReadOnlyOptimal = 4,
-	ShaderReadOnlyOptimal = 5,
-	TransferSrcOptimal = 6,
-	TransferDstOptimal = 7,
-	Preinitialized = 8,
-	DepthReadOnlyStencilAttachmentOptimal = 9,
-	DepthAttachmentStencilReadOnlyOptimal = 10,
-	PresentSrc = 11,
-	SharedPresentSrc = 12,
-	ShadingRateOptimal = 13,
-	FragmentDensityMapOptimal = 14,
-}
-
---- @class RenderTargetAttachmentLoadOp
-RenderTargetAttachmentLoadOp = {
-	Load = 0,
-	Clear = 1,
-	DontCare = 2,
-}
-
---- @class RenderTargetAttachmentStoreOp
-RenderTargetAttachmentStoreOp = {
-	Store = 0,
-	DontCare = 1,
-}
-
---- @class ResourceMemoryUsage
-ResourceMemoryUsage = {
-	Unknown = 0,
-	GpuOnly = 1,
-	CpuToGpu = 2,
-	GpuToCpu = 3,
-}
-
---- @class ResourceState
-ResourceState = {
-	Unknown = 0,
-	Undefined = 1,
-	VertexBuffer = 2,
-	ConstantBuffer = 3,
-	IndexBuffer = 4,
-	SBTBuffer = 5,
-	RenderTarget = 6,
-	UnorderedAccess = 7,
-	DepthWrite = 8,
-	DepthRead = 9,
-	ShaderResource = 10,
-	IndirectArgument = 11,
-	CopyDest = 12,
-	CopySource = 13,
-	AccelerationStructure = 14,
-	Present = 15,
-}
-
---- @class ResourceStateTransitionMode
-ResourceStateTransitionMode = {
-	None = 0,
-	Transition = 1,
-	Verify = 2,
 }
 
 --- @class ResourceUsage
@@ -4142,8 +4489,13 @@ TextureWrappingMode = {
 --- @class Type
 Type = {
 	Unknown = 0,
-	TopLevel = 1,
-	BottomLevel = 2,
+	Texture1D = 1,
+	Texture1DArray = 2,
+	Texture2D = 3,
+	Texture2DArray = 4,
+	Texture3D = 5,
+	TextureCube = 6,
+	TextureCubeArray = 7,
 }
 
 --- @class UpdateFrequency
@@ -4158,16 +4510,14 @@ UpdateFrequency = {
 UsageFlagBits = {
 	UsageTransferSrcBIT = 0,
 	UsageTransferDstBIT = 1,
-	UsageUniformTexelBufferBIT = 2,
-	UsageStorageTexelBufferBIT = 3,
-	UsageUniformBufferBIT = 4,
-	UsageStorageBufferBIT = 5,
-	UsageIndexBufferBIT = 6,
-	UsageVertexBufferBIT = 7,
-	UsageIndirectBufferBIT = 8,
-	UsageConditionalRenderingBIT = 9,
-	UsageRayTracingBIT = 10,
-	UsageShaderDeviceAddressBIT = 11,
+	UsageSampledBIT = 2,
+	UsageStorageBIT = 3,
+	UsageColorAttachmentBIT = 4,
+	UsageDepthStencilAttachmentBIT = 5,
+	UsageTransientAttachmentBIT = 6,
+	UsageInputAttachmentBIT = 7,
+	UsageShadingRateImageBIT = 8,
+	UsageFragmentDensityMapBIT = 9,
 }
 
 --- @class VSyncMode
@@ -4199,6 +4549,11 @@ VertexComponent = {
 	Bitangent = 16,
 	Index = 17,
 	Unknown = 18,
+	Data0 = 19,
+	Data1 = 20,
+	Data2 = 21,
+	Data3 = 22,
+	Data4 = 23,
 }
 
 --- @class VertexComponentFormat
@@ -4232,5 +4587,27 @@ VertexComponentFormat = {
 	FloatVec2 = 26,
 	FloatVec3 = 27,
 	FloatVec4 = 28,
+	FloatMat2x2 = 29,
+	FloatMat2x3 = 30,
+	FloatMat2x4 = 31,
+	FloatMat3x2 = 32,
+	FloatMat3x3 = 33,
+	FloatMat3x4 = 34,
+	FloatMat4x2 = 35,
+	FloatMat4x3 = 36,
+	FloatMat4x4 = 37,
+	Double = 38,
+	DoubleVec2 = 39,
+	DoubleVec3 = 40,
+	DoubleVec4 = 41,
+	DoubleMat2x2 = 42,
+	DoubleMat2x3 = 43,
+	DoubleMat2x4 = 44,
+	DoubleMat3x2 = 45,
+	DoubleMat3x3 = 46,
+	DoubleMat3x4 = 47,
+	DoubleMat4x2 = 48,
+	DoubleMat4x3 = 49,
+	DoubleMat4x4 = 50,
 }
 
