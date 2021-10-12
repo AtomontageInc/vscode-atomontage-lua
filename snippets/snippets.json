@@ -11,7 +11,7 @@
 			"$0",
 			"end",
 			"",
-			"function script:Update(dt, t)",
+			"function script:Update(dt)",
 			"",
 			"end",
 			"",
