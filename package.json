@@ -51,6 +51,8 @@
 		"sumneko.lua"
 	],
 	"scripts": {
+		"patch": "vsce publish patch",
+		"minor": "vsce publish minor",
 		"vscode:prepublish": "yarn run compile",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
