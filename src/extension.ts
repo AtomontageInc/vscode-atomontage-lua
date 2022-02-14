@@ -16,7 +16,7 @@ export function setUserThirdPartyAllWorkspaceFolders(folder: string, enable: boo
 		setUserThirdParty(config, folder, enable);
 		
 		//this is not a multi root workspace so inform user
-		multiRootInfo();
+		//multiRootInfo();
 	}
 
 }
