@@ -9,7 +9,7 @@
 function OnSetText(uri, text)
     local diffs = {}
 
-    local lastReturnVar = "script"
+    local lastReturnVar = "self"
     --TODO this is disabled for now sicne there is ohter non component scripts with return 
     --will have to detect this later through path in uri?
     --[[
@@ -20,7 +20,7 @@ function OnSetText(uri, text)
     ]]
 
     if lastReturnVar then
-        -- find all 'local script = {}' and add 'Script' type annotation
+        -- find all 'local self = {}' and add 'Script' type annotation
         local pattern = '()local%s+'..lastReturnVar..'%s*=%s*{.-}'
         local iter = text:gmatch(pattern)
         for pos in iter do

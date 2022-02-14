@@ -1,9 +1,9 @@
 -- if not set, the folder name will be used
-name    = 'Atomontage Server'
+name    = 'Atomontage System'
 -- list of matched words
---words   = {"Server:%w+"}
+--words   = {'thisIsAnExampleWord%.ifItExistsInFile%.bla'}
 -- list or matched file names. `.lua`, `.dll` and `.so` only
-files   = {'Server%.lua'}
+files   = {'ae/bootstrap%.lua', "bootstrap%.lua"}
 -- lsit of settings to be changed
 configs = {
     {

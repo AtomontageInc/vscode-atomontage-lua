@@ -1,9 +1,9 @@
 -- if not set, the folder name will be used
-name    = 'Atomontage Client'
+name    = 'Atomontage'
 -- list of matched words
---words   = {'Client:%w+',  "Input:%w+"}
+--words   = {"Input:%w+"} --if I add these words file detection breaks and they dont work either
 -- list or matched file names. `.lua`, `.dll` and `.so` only
-files   = {'ClientScene%.lua'}
+files   = {'Sky%.lua', "Camera Controller%.lua", "Brush%.lua", "Voxel Inspector%.lua"}
 -- lsit of settings to be changed
 configs = {
     {
