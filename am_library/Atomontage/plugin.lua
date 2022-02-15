@@ -27,7 +27,7 @@ function OnSetText(uri, text)
             table.insert(diffs, {
                 start = pos,
                 finish = pos -1,
-                text = "--- @type Script\n",
+                text = "--- @type ScriptInstance\n",
             })
         end
     end
