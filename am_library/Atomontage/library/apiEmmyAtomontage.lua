@@ -1721,9 +1721,10 @@ Object = {}
 --- @return nil
 function Object:RemoveAllNonNativeComponents() end
 
---- @param p1 string
---- @return userdata
-function Object:AddComponent(p1) end
+--- @generic T:Component
+--- @param type `T`|componentType
+--- @return T
+function Object:AddComponent(type) end
 
 --- @param p1 integer
 --- @return userdata
@@ -1740,13 +1741,15 @@ function Object:RemoveComponent(p1) end
 --- @return userdata
 function Object:RemoveComponent(p1) end
 
---- @param p1 componentType
---- @return userdata
-function Object:GetComponentByType(p1) end
+--- @generic T:Component
+--- @param type `T`|componentType
+--- @return T
+function Object:GetComponentByType(type) end
 
---- @param p1 componentType
---- @return table
-function Object:GetComponentsByType(p1) end
+--- @generic T:Component
+--- @param type `T`|componentType
+--- @return T[]
+function Object:GetComponentsByType(type) end
 
 --- @param p1 string
 --- @return ScriptComponent
@@ -2070,8 +2073,9 @@ function Scene:Test() end
 function Scene:CreateObject() end
 
 --- @param p1 Object
+--- @param p2 ?string
 --- @return Object
-function Scene:CloneObject(p1) end
+function Scene:CloneObject(p1, p2) end
 
 --- @param p1 Object
 --- @return nil
@@ -2268,9 +2272,9 @@ function ScriptInstance:Detach() end
 
 --- @param toClient integer
 --- @param functionName string
---- @param values ...
+--- @vararg any values
 --- @return nil
-function ScriptInstance:RPC(toClient, functionName, values) end
+function ScriptInstance:RPC(toClient, functionName, ...) end
 
 --[[
 `Server`
