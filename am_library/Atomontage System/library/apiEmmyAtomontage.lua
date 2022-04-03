@@ -13,25 +13,6 @@
 
 --- @meta
 
---- @class Script
---- @field component ScriptComponent
---- @field onServer boolean
---- @field onClient boolean
-script = {}
-
--- Called on script instance initialization. Usually after changing `.instance` or `.file` property
-function script:Attach() end
-
--- Called on script release. Usually on object destruction or to release old script instance during change of `.instance` or `.file` property
-function script:Detach() end
-
--- Called once before the first Update
-function script:Start() end
-
--- Called if updates are enabled (they are enabled automatically if attached script has this method). dt is frame time delta in seconds and t is application time in seconds.
---- @param dt number delta time since last update
-function script:Update(dt) end
-
 --- @class ControllerButtons
 ControllerButtons = {}
 
@@ -1726,9 +1707,9 @@ NativeComponent = {}
 --- @field name string
 --- @field tag string
 --- @field transform Transform
---- @field parent userdata
---- @field components table
---- @field children table
+--- @field parent Object
+--- @field components Object[]
+--- @field children Object[]
 --- @field id integer
 --- @field isDestroyed boolean
 --- @field componentsCount integer
@@ -1740,9 +1721,10 @@ Object = {}
 --- @return nil
 function Object:RemoveAllNonNativeComponents() end
 
---- @param p1 string
---- @return userdata
-function Object:AddComponent(p1) end
+--- @generic T:Component
+--- @param type `T`|componentType
+--- @return T
+function Object:AddComponent(type) end
 
 --- @param p1 integer
 --- @return userdata
@@ -1759,13 +1741,15 @@ function Object:RemoveComponent(p1) end
 --- @return userdata
 function Object:RemoveComponent(p1) end
 
---- @param p1 string
---- @return userdata
-function Object:GetComponentByType(p1) end
+--- @generic T:Component
+--- @param type `T`|componentType
+--- @return T
+function Object:GetComponentByType(type) end
 
---- @param p1 string
---- @return table
-function Object:GetComponentsByType(p1) end
+--- @generic T:Component
+--- @param type `T`|componentType
+--- @return T[]
+function Object:GetComponentsByType(type) end
 
 --- @param p1 string
 --- @return ScriptComponent
@@ -2089,8 +2073,9 @@ function Scene:Test() end
 function Scene:CreateObject() end
 
 --- @param p1 Object
+--- @param name ?string
 --- @return Object
-function Scene:CloneObject(p1) end
+function Scene:CloneObject(p1, name) end
 
 --- @param p1 Object
 --- @return nil
@@ -2104,17 +2089,17 @@ function Scene:CreateMaterial(p1) end
 function Scene:DebugStats() end
 
 --- @param p1 string
---- @return table
+--- @return Object[]
 function Scene:GetObjectsByName(p1) end
 
---- @return table
+--- @return Object[]
 function Scene:GetAllObjects() end
 
---- @return table
+--- @return Object[]
 function Scene:GetRootObjects() end
 
 --- @param p1 string
---- @return table
+--- @return Object[]
 function Scene:GetObjectsByTag(p1) end
 
 --- @param p1 integer
@@ -2259,6 +2244,39 @@ function ScriptComponent:RPC(p1, p2) end
 function ScriptComponent:RPC2(p1, p2, p3) end
 
 --[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/ScriptInstance)
+]]
+--- @class ScriptInstance
+--- @field component ScriptComponent
+--- @field object Object
+--- @field transform Transform
+--- @field onServer boolean
+--- @field onClient boolean
+ScriptInstance = {}
+
+--- @return nil
+function ScriptInstance:Start() end
+
+--- @param deltaTime number
+--- @return nil
+function ScriptInstance:Update(deltaTime) end
+
+--- @return nil
+function ScriptInstance:Attach() end
+
+--- @return nil
+function ScriptInstance:Detach() end
+
+--- @param toClient? integer
+--- @param functionName string
+--- @vararg any values
+--- @return nil
+function ScriptInstance:RPC(toClient, functionName, ...) end
+
+--[[
 `Server`
 :::info Server Only
 This class is only available on server
@@ -2269,7 +2287,7 @@ This class is only available on server
 --- @class Server
 Server = {}
 
---- @return table
+--- @return number[]
 function Server:GetClients() end
 
 --- @param toClientID integer
@@ -2389,7 +2407,7 @@ StaticVoxelDataComponent = {}
 --- @field localPos Vec3
 --- @field localScale number
 --- @field localRot Quat
---- @field parent userdata
+--- @field parent Transform
 --- @field right Vec3
 --- @field up Vec3
 --- @field forward Vec3
@@ -2398,11 +2416,11 @@ StaticVoxelDataComponent = {}
 Transform = {}
 
 --- @param p1 integer
---- @return userdata
+--- @return Transform
 function Transform:GetChild(p1) end
 
 --- @param p1 string
---- @return userdata
+--- @return Transform
 function Transform:GetChild(p1) end
 
 --- @param p1 integer

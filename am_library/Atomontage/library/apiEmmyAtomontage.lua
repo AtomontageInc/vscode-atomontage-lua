@@ -1707,9 +1707,9 @@ NativeComponent = {}
 --- @field name string
 --- @field tag string
 --- @field transform Transform
---- @field parent userdata
---- @field components table
---- @field children table
+--- @field parent Object
+--- @field components Object[]
+--- @field children Object[]
 --- @field id integer
 --- @field isDestroyed boolean
 --- @field componentsCount integer
@@ -2073,9 +2073,9 @@ function Scene:Test() end
 function Scene:CreateObject() end
 
 --- @param p1 Object
---- @param p2 ?string
+--- @param name ?string
 --- @return Object
-function Scene:CloneObject(p1, p2) end
+function Scene:CloneObject(p1, name) end
 
 --- @param p1 Object
 --- @return nil
@@ -2089,17 +2089,17 @@ function Scene:CreateMaterial(p1) end
 function Scene:DebugStats() end
 
 --- @param p1 string
---- @return table
+--- @return Object[]
 function Scene:GetObjectsByName(p1) end
 
---- @return table
+--- @return Object[]
 function Scene:GetAllObjects() end
 
---- @return table
+--- @return Object[]
 function Scene:GetRootObjects() end
 
 --- @param p1 string
---- @return table
+--- @return Object[]
 function Scene:GetObjectsByTag(p1) end
 
 --- @param p1 integer
@@ -2270,7 +2270,7 @@ function ScriptInstance:Attach() end
 --- @return nil
 function ScriptInstance:Detach() end
 
---- @param toClient integer
+--- @param toClient? integer
 --- @param functionName string
 --- @vararg any values
 --- @return nil
@@ -2287,7 +2287,7 @@ This class is only available on server
 --- @class Server
 Server = {}
 
---- @return table
+--- @return number[]
 function Server:GetClients() end
 
 --- @param toClientID integer
@@ -2407,7 +2407,7 @@ StaticVoxelDataComponent = {}
 --- @field localPos Vec3
 --- @field localScale number
 --- @field localRot Quat
---- @field parent userdata
+--- @field parent Transform
 --- @field right Vec3
 --- @field up Vec3
 --- @field forward Vec3
@@ -2416,11 +2416,11 @@ StaticVoxelDataComponent = {}
 Transform = {}
 
 --- @param p1 integer
---- @return userdata
+--- @return Transform
 function Transform:GetChild(p1) end
 
 --- @param p1 string
---- @return userdata
+--- @return Transform
 function Transform:GetChild(p1) end
 
 --- @param p1 integer
