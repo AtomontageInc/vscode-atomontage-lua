@@ -9,7 +9,7 @@
 			"local self = {}",
 			"",
 			"function self:Start()",
-			"$0",
+			"\t$0",
 			"end",
 			"",
 			"function self:Update(dt)",
@@ -19,5 +19,57 @@
 			"return self"
 		],
 		"description": "Script Component with callbacks"
+	},
+
+	"Attach": {
+		"prefix": [
+			"function self:Attach()",
+			"Attach"
+		],
+		"body": [
+			"function self:Attach()",
+			"\t$0",
+			"end"
+		],
+		"description": "Script Component Attach() function"
+	},
+
+	"Detach": {
+		"prefix": [
+			"function self:Detach()",
+			"Detach"
+		],
+		"body": [
+			"function self:Detach()",
+			"\t$0",
+			"end"
+		],
+		"description": "Script Component Detach() function"
+	},
+
+	"Start": {
+		"prefix": [
+			"function self:Start()",
+			"Start"
+		],
+		"body": [
+			"function self:Start()",
+			"\t$0",
+			"end"
+		],
+		"description": "Script Component Start() function"
+	},
+
+	"Update": {
+		"prefix": [
+			"function self:Update()",
+			"Update"
+		],
+		"body": [
+			"function self:Update()",
+			"\t$0",
+			"end"
+		],
+		"description": "Script Component Update() function"
 	}
 }
