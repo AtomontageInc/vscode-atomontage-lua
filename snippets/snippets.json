@@ -62,11 +62,11 @@
 
 	"Update": {
 		"prefix": [
-			"function self:Update()",
+			"function self:Update(dt)",
 			"Update"
 		],
 		"body": [
-			"function self:Update()",
+			"function self:Update(dt)",
 			"\t$0",
 			"end"
 		],
