@@ -1,4 +1,17 @@
---- @alias serializableType nil|boolean|number|string|Vec2|Vec2i|Vec3|Vec3i|Mat4|Quat
+
+--- @meta
+
+--- @alias serializableType
+---| nil
+---| boolean
+---| number
+---| string
+---| Vec2
+---| Vec2i
+---| Vec3
+---| Vec3i
+---| Mat4
+---| Quat
 
 --- @alias componentType
 ---| "'CameraComponent'"
@@ -14,9 +27,9 @@
 ---| "'VoxelRender'"
 
 --- @alias mouseButton
----| '0' # left button
----| '1' # middle button
----| '2' # right button
+---| 1 # left button
+---| 2 # middle button
+---| 3 # right button
 
 --https://wiki.libsdl.org/SDL_Keycode
 --- @alias keyCode
@@ -241,7 +254,6 @@
 ---| '"Z"'
 
 
---- @meta
 
 --- @class ControllerButtons
 ControllerButtons = {}
@@ -1971,14 +1983,14 @@ function Object:RemoveComponent(p1) end
 --- @return userdata
 function Object:RemoveComponent(p1) end
 
---- @generic T:Component
---- @param type `T`|componentType
---- @return T
+--- @generic ComponentType:Component
+--- @param type `ComponentType`|componentType
+--- @return ComponentType
 function Object:GetComponentByType(type) end
 
---- @generic T:Component
---- @param type `T`|componentType
---- @return T[]
+--- @generic ComponentType:Component
+--- @param type `ComponentType`|componentType
+--- @return ComponentType[]
 function Object:GetComponentsByType(type) end
 
 --- @param p1 string
@@ -2077,6 +2089,9 @@ Quat = {}
 --- @field yaw number
 --- @field roll number
 Quat = {}
+
+--- @return Vec3
+function Quat:GetEuler() end
 
 --- @return Quat
 function Quat() end
@@ -2500,9 +2515,10 @@ function ScriptInstance:Attach() end
 --- @return nil
 function ScriptInstance:Detach() end
 
---- @param toClient? integer
+--- @overload fun(self, functionName: string, ...:serializableType):nil
+--- @param toClient integer
 --- @param functionName string
---- @vararg any values
+--- @vararg serializableType values
 --- @return nil
 function ScriptInstance:RPC(toClient, functionName, ...) end
 

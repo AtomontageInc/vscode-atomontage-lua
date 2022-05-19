@@ -1,3 +1,6 @@
+
+--C:\Users\maxkr\.vscode\extensions\sumneko.lua-3.1.0-win32-x64\server\log\diffed.lua
+
 ---@class diff
 ---@field start  integer # The number of bytes at the beginning of the replacement
 ---@field finish integer # The number of bytes at the end of the replacement
