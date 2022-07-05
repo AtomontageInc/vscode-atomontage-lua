@@ -1,9 +1,9 @@
 -- if not set, the folder name will be used
 name    = 'Atomontage System'
 -- list of matched words
---words   = {'thisIsAnExampleWord%.ifItExistsInFile%.bla'}
+words   = { 'Callbacks%.update' }
 -- list or matched file names. `.lua`, `.dll` and `.so` only
-files   = {'ae/bootstrap%.lua', "bootstrap%.lua"}
+files   = { 'ae/bootstrap%.lua', "bootstrap%.lua" } --those dont work?
 -- lsit of settings to be changed
 configs = {
     {

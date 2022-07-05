@@ -1,9 +1,9 @@
 -- if not set, the folder name will be used
 name    = 'Atomontage'
 -- list of matched words
---words   = {"Input:%w+"} --if I add these words file detection breaks and they dont work either
+words   = { "self%:Attach", "self%:Start" }
 -- list or matched file names. `.lua`, `.dll` and `.so` only
-files   = {'Sky%.lua', "Camera Controller%.lua", "Brush%.lua", "Voxel Inspector%.lua"}
+files   = {'Sky%.lua', "Camera Controller%.lua", "Brush%.lua", "Voxel Inspector%.lua"} --those dont work?
 -- lsit of settings to be changed
 configs = {
     {
