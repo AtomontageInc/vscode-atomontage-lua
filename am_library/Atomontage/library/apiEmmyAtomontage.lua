@@ -422,6 +422,11 @@ function Vec3:GetClamped(p2, p3) end
 function Vec3:GetClamped(p2, p3) end
 
 
+--- @param p1 string
+--- @return Material
+function Scene:CreateMaterial(p1) end
+
+
 --- @alias componentType
 ---| "'Camera'"
 ---| "'MeshData'"
@@ -2657,7 +2662,7 @@ function Scene:CloneObject(p1) end
 function Scene:CloneObject(p1, p2) end
 
 --- @param p1 string
---- @return userdata
+--- @return Material
 function Scene:CreateMaterial(p1) end
 
 --- @return Camera
