@@ -71,5 +71,31 @@
 			"end"
 		],
 		"description": "Script Component Update() function"
+	},
+
+	"OnActivate": {
+		"prefix": [
+			"function self:OnActivate()",
+			"OnActivate"
+		],
+		"body": [
+			"function self:OnActivate()",
+			"\t$0",
+			"end"
+		],
+		"description": "Script Component OnActivate() function"
+	},
+
+	"OnDeactivate": {
+		"prefix": [
+			"function self:OnDeactivate()",
+			"OnDeactivate"
+		],
+		"body": [
+			"function self:OnDeactivate()",
+			"\t$0",
+			"end"
+		],
+		"description": "Script Component OnDeactivate() function"
 	}
 }
