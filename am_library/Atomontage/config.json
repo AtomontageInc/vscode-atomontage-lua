@@ -1,0 +1,32 @@
+{
+  "configs": [
+    {
+      "action": "set",
+      "key": "Lua.runtime.version",
+      "value": "Lua 5.3"
+    },
+    {
+      "action": "prop",
+      "key": "Lua.runtime.builtin",
+      "prop": "io",
+      "value": "disable"
+    },
+    {
+      "action": "prop",
+      "key": "Lua.runtime.builtin",
+      "prop": "os",
+      "value": "disable"
+    }
+  ],
+  "files": [
+    "Sky%.lua",
+    "Camera Controller%.lua",
+    "Brush%.lua",
+    "Voxel Inspector%.lua"
+  ],
+  "name": "Atomontage",
+  "words": [
+    "self%:Attach",
+    "self%:Start"
+  ]
+}

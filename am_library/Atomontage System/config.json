@@ -1,0 +1,29 @@
+{
+  "configs": [
+    {
+      "action": "set",
+      "key": "Lua.runtime.version",
+      "value": "Lua 5.3"
+    },
+    {
+      "action": "prop",
+      "key": "Lua.runtime.builtin",
+      "prop": "os",
+      "value": "disable"
+    },
+    {
+      "action": "prop",
+      "key": "Lua.runtime.builtin",
+      "prop": "io",
+      "value": "disable"
+    }
+  ],
+  "files": [
+    "ae/bootstrap%.lua",
+    "bootstrap%.lua"
+  ],
+  "name": "Atomontage System",
+  "words": [
+    "Callbacks%.update"
+  ]
+}
