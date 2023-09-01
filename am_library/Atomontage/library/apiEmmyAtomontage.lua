@@ -430,6 +430,23 @@ function Vec3:GetClamped(p2, p3) end
 --- @return Material
 function Scene:CreateMaterial(p1) end
 
+--- @param text string
+--- @param pos Vec2 0-1
+--- @param pivot Vec2 0 = left allingned, 0.5 = centered, 1 = right alligned
+--- @param color Vec4
+--- @param size integer 1-6
+--- @param colorOutline Vec4?
+--- @param p7 number?
+--- @return nil
+function Client:WriteToScreen(text, pos, pivot, color, size, colorOutline, p7) end
+
+--- @param hand Side
+--- @param duration number in seconds, 0 <= minimal
+--- @param frequency number Hz, 0 = unspecified
+--- @param amplitude number 0-1
+--- @return nil
+function Client:ApplyVRHapticFeedback(p1, p2, p3, p4) end
+
 --- @alias componentType
 ---| "'Camera'"
 ---| "'MeshData'"
@@ -657,6 +674,15 @@ function Client:IsWindowOpen(windowID) end
 --- @param position Vec2
 --- @return nil
 function Client:SetWindowPos(windowID, position) end
+
+--- @return nil
+function Client:OpenUI() end
+
+--- @return nil
+function Client:CloseUI() end
+
+--- @return boolean
+function Client:IsUIOpen() end
 
 --- @param p1 string
 --- @return nil
@@ -942,11 +968,30 @@ function Client:SetVREnabled(p1, p2) end
 function Client:ToggleVREnabled(p1) end
 
 --- @param p1 integer
+--- @param p2 Space
 --- @return Vec3, Quat
-function Client:GetVREyeTransform(p1) end
+function Client:GetVREyeTransform(p1, p2) end
+
+--- @param p1 Space
+--- @return Vec3, Quat
+function Client:GetVRHeadsetTransform(p1) end
+
+--- @param p1 integer
+--- @param p2 number
+--- @param p3 number
+--- @param p4 number
+--- @return nil
+function Client:ApplyVRHapticFeedback(p1, p2, p3, p4) end
 
 --- @return boolean
 function Client:GetVREyeTrackingSupported() end
+
+--- @param p1 number
+--- @return nil
+function Client:SetVRUserScale(p1) end
+
+--- @return number
+function Client:GetVRUserScale() end
 
 --- @return nil
 function Client:TriggerCrash() end
@@ -1079,6 +1124,7 @@ function Client:ToggleTestRenderObjectEnabled(p1) end
 --- @field filter Filter
 --- @field maxHitCount integer
 --- @field shape Shape
+--- @field precise boolean
 --- @field rayPos Vec3
 --- @field rayDir Vec3
 Collision = {
@@ -1112,10 +1158,19 @@ function Collision:Raycast(p1, p2) end
 --[[
 checks collision between shape and geometry passed by filter
 
-[View Documentation](https://docs.atomontage.com/api/Collision#bool-Check)
+[View Documentation](https://docs.atomontage.com/api/Collision#table-GetOverlap)
 ]]
---- @return boolean
-function Collision:Check() end
+--- @return table
+function Collision:GetOverlap() end
+
+--[[
+checks collision between shape and geometry passed by filter
+
+[View Documentation](https://docs.atomontage.com/api/Collision#table-GetOverlap-Shape)
+]]
+--- @param p1 Shape
+--- @return table
+function Collision:GetOverlap(p1) end
 
 --[[
 `Client`
@@ -1157,8 +1212,6 @@ function CommandLine:GetAll(p1) end
 --[[
 `Client`
 `Server`
-
-See also: [ScriptComponent](ScriptComponent)
 
 [View Documentation](https://docs.atomontage.com/api/Component)
 ]]
@@ -1352,6 +1405,7 @@ function Cylinder.new(p1, p2) end
 --- @field ignoreList table
 --- @field forceList table
 Filter = {
+	useNotStatic = nil, ---use dynamic voxel objects
 	ignoreList = nil, ---contains objects
 	forceList = nil, ---contains objects
 }
@@ -1564,6 +1618,11 @@ function Input:VRControllerPos(p1) end
 --- @param p1 integer
 --- @return Vec3
 function Input:VRControllerDir(p1) end
+
+--- @param p1 integer
+--- @param p2 Space
+--- @return Vec3, Quat
+function Input:VRControllerTransform(p1, p2) end
 
 --- @return userdata
 function Input:Gamepads() end
@@ -2177,9 +2236,10 @@ function Material:IsValid() end
 --- @return boolean
 function Material:IsManaged() end
 
---- @param p1 string
+--- @param p1 Material
+--- @param p2 string
 --- @return boolean
-function Material:HasProperty(p1) end
+function Material:HasProperty(p1, p2) end
 
 --- @param p1 Material
 --- @param p2 string
@@ -2779,6 +2839,28 @@ function Scene:GetVoxelDB(p1) end
 --- @return table
 function Scene:TraceRay(p1) end
 
+--- @param p1 VoxelRenderer
+--- @param p2 Vec3
+--- @return Vec3
+function Scene:ConvertWcToDc(p1, p2) end
+
+--- @param p1 this_state
+--- @param p2 VoxelRenderer
+--- @param p3 table
+--- @return table
+function Scene:ConvertWcToDc(p1, p2, p3) end
+
+--- @param p1 VoxelRenderer
+--- @param p2 Vec3
+--- @return Vec3
+function Scene:ConvertDcToWc(p1, p2) end
+
+--- @param p1 this_state
+--- @param p2 VoxelRenderer
+--- @param p3 table
+--- @return table
+function Scene:ConvertDcToWc(p1, p2, p3) end
+
 --- @param p1 string
 --- @return boolean
 function Scene:IsNameValid(p1) end
@@ -2969,6 +3051,9 @@ function Server:GetMemoryUsage() end
 --- @return table
 function Server:GetErrors() end
 
+--- @return integer
+function Server:GetMaxConnections() end
+
 --- @return boolean
 function Server:GetStartedWithOriginalScripts() end
 
@@ -3048,6 +3133,9 @@ function Server:GenTestVoxelScene() end
 
 --- @return nil
 function Server:GenTestVoxelScene2() end
+
+--- @return nil
+function Server:GenTestVoxelScene3() end
 
 --- @param p1 integer
 --- @param p2 integer
@@ -6452,22 +6540,19 @@ function VoxelDB:Save(p1, p2, p3) end
 
 --- @param p1 this_state
 --- @param p2 Vec3
---- @param p3 Vec3
---- @param p4 number
---- @param p5 integer
+--- @param p3 integer
+--- @param p4 integer
+--- @return userdata
+function VoxelDB:InspectNormals(p1, p2, p3, p4) end
+
+--- @param p1 this_state
+--- @param p2 Vec3
+--- @param p3 integer
+--- @param p4 integer
+--- @param p5 table
 --- @param p6 integer
 --- @return userdata
-function VoxelDB:InspectNormals(p1, p2, p3, p4, p5, p6) end
-
---- @param p1 Vec3
---- @param p2 Vec3
---- @param p3 number
---- @param p4 integer
---- @param p5 integer
---- @param p6 table
---- @param p7 integer
---- @return VoxelInspectData
-function VoxelDB:Inspect(p1, p2, p3, p4, p5, p6, p7) end
+function VoxelDB:Inspect(p1, p2, p3, p4, p5, p6) end
 
 --- @return integer
 function VoxelDB:GetLODsCount() end
@@ -6524,6 +6609,7 @@ function VoxelData:__eq(p1, p2) end
 --- @field isSaved boolean
 --- @field hasAnyVoxels boolean
 --- @field volumePerc number
+--- @field scaleToStatic number
 VoxelDataResource = {
 	isEditable = nil, ---returns false if loaded as aevv
 	isSaved = nil, ---returns true if data was modified
@@ -6575,7 +6661,7 @@ function VoxelDataResource:RebuildLighting() end
 --- @field blendRadiusRatio number
 --- @field color Vec3
 --- @field filter userdata
---- @field shape Shape
+--- @field shape userdata
 --- @field clampToMinVoxelSize boolean
 --- @field copySourceTr Transform
 --- @field copyDestinationTr Transform
@@ -6592,7 +6678,11 @@ function VoxelDataResource:RebuildLighting() end
 --- @field kernelType integer
 --- @field onProgress userdata
 --- @field onFinished userdata
-VoxelEdit = {}
+--- @field onError userdata
+VoxelEdit = {
+	onProgress = nil, ---callback function. progress from 0-1. May not be called every frame. Is called after script updates
+	onFinished = nil, ---callback function. onFinished is called after onProgress if it was last part
+}
 
 --- @return VoxelEdit
 function VoxelEdit() end
@@ -6630,11 +6720,11 @@ It projects cone on voxel geometry and everything inside will be copies to tmp
 all raycasts will collide with this tmp layer instead until FreeTmpLayers
 parameters specify "cone" - two positions and end radius
 
-[View Documentation](https://docs.atomontage.com/api/VoxelEdit#nil-FillTmpLayers-int-Vec3-Vec3-float-int)
+[View Documentation](https://docs.atomontage.com/api/VoxelEdit#nil-FillTmpLayers-int-Vec3-table-float-int)
 ]]
 --- @param p1 integer
 --- @param p2 Vec3
---- @param p3 Vec3
+--- @param p3 table
 --- @param p4 number
 --- @param p5 integer
 --- @return nil
@@ -6675,6 +6765,8 @@ function VoxelInspectData:GetColors() end
 --- @field enabled boolean
 --- @field prioritizeLod boolean
 --- @field outline boolean
+--- @field tintColor Vec4
+--- @field receiveTransform boolean
 VoxelRenderer = {}
 
 --- @param p1 VoxelRenderer
@@ -6931,8 +7023,11 @@ Hint for opengl/vulkan about how often you change the geometry (static = once, d
 ]]
 --- @enum ResourceUsage
 ResourceUsage = {
+	-- once
 	Static = 0,
+	-- more often
 	Dynamic = 1,
+	-- each frame
 	Stream = 2,
 }
 
@@ -6997,6 +7092,12 @@ ShaderResourceType = {
 Side = {
 	Left = 0,
 	Right = 1,
+}
+
+--- @enum Space
+Space = {
+	Local = 0,
+	World = 1,
 }
 
 --- @enum System
@@ -7107,7 +7208,8 @@ VRControllerButton = {
 	B = 1,
 	Menu = 2,
 	Thumb = 3,
-	Shoulder = 4,
+	Trigger = 4,
+	Grip = 5,
 }
 
 --- @enum VSyncMode
