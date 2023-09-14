@@ -26,11 +26,12 @@ function OnSetText(uri, text)
         -- find all 'local self = {}' and add 'Script' type annotation
         local pattern = '()local%s+'..lastReturnVar..'%s*=%s*{.-}'
         local iter = text:gmatch(pattern)
+        local className = "Script" --tODO get from uri
         for pos in iter do
             table.insert(diffs, {
                 start = pos,
                 finish = pos -1,
-                text = "--- @type ScriptInstance\n",
+                text = string.format("--- @class %s:ScriptInstance\n", className),
             })
         end
     end
