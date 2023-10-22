@@ -6,6 +6,11 @@
 ---@field finish integer # The number of bytes at the end of the replacement
 ---@field text   string  # What to replace
 
+
+local function getFilename(str)
+    return str:match("^.*/(.*).lua$") or str
+end
+
 ---@param  uri  string # The uri of file
 ---@param  text string # The content of file
 ---@return nil|diff[]
@@ -26,7 +31,8 @@ function OnSetText(uri, text)
         -- find all 'local self = {}' and add 'Script' type annotation
         local pattern = '()local%s+'..lastReturnVar..'%s*=%s*{.-}'
         local iter = text:gmatch(pattern)
-        local className = "Script" --tODO get from uri
+        --generate class name from file name, removed spaces
+        local className = getFilename(uri):gsub("%%20", "")
         for pos in iter do
             table.insert(diffs, {
                 start = pos,
