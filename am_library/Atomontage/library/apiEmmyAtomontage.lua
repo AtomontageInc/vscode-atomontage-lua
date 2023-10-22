@@ -514,17 +514,17 @@ function AssetManager:GetFilePath(p1) end
 --- @class Box
 Box = {}
 
---- @return Shape
-function Box.new() end
+--- @return Box
+function Box() end
 
 --- @param p1 Vec3
 --- @param p2 Vec3
---- @return Shape
-function Box.new(p1, p2) end
+--- @return Box
+function Box(p1, p2) end
 
 --- @param p1 Vec3
---- @return Shape
-function Box.new(p1) end
+--- @return Box
+function Box(p1) end
 
 --[[
 `Client`
@@ -560,32 +560,20 @@ function Camera:WorldToScreen3f(p1) end
 --- @class Capsule
 Capsule = {}
 
---- @return Shape
-function Capsule.new() end
-
---- @param p1 Vec3
---- @param p2 number
---- @return Shape
-function Capsule.new(p1, p2) end
-
---- @param p1 Vec3
---- @return Shape
-function Capsule.new(p1) end
-
---- @return Shape
-function Capsule.new() end
+--- @return Capsule
+function Capsule() end
 
 --- @param p1 Vec3
 --- @param p2 Vec3
 --- @param p3 number
 --- @param p4 number
---- @return Shape
-function Capsule.new(p1, p2, p3, p4) end
+--- @return Capsule
+function Capsule(p1, p2, p3, p4) end
 
 --- @param p1 Vec3
 --- @param p2 Vec3
---- @return Shape
-function Capsule.new(p1, p2) end
+--- @return Capsule
+function Capsule(p1, p2) end
 
 --[[
 `Client`
@@ -683,6 +671,14 @@ function Client:CloseUI() end
 
 --- @return boolean
 function Client:IsUIOpen() end
+
+--- @param p1 Quat
+--- @param p2 Vec3
+--- @return nil
+function Client:SetUIPose(p1, p2) end
+
+--- @return Quat, Vec3
+function Client:GetUIPose() end
 
 --- @param p1 string
 --- @return nil
@@ -810,6 +806,9 @@ function Client:GetLogTime(p1) end
 --- @param p1 string
 --- @return table
 function Client:GetLogTimers(p1) end
+
+--- @return table
+function Client:GetMainDispatcherStats() end
 
 --- @return number
 function Client:GetFPS() end
@@ -993,6 +992,10 @@ function Client:SetVRUserScale(p1) end
 --- @return number
 function Client:GetVRUserScale() end
 
+--- @param p1 File
+--- @return nil
+function Client:SendFile(p1) end
+
 --- @return nil
 function Client:TriggerCrash() end
 
@@ -1051,6 +1054,9 @@ function Client:GetVersion() end
 
 --- @return System
 function Client:GetSystem() end
+
+--- @return Device
+function Client:GetDevice() end
 
 --- @return integer
 function Client:GetMemoryUsage() end
@@ -1349,47 +1355,33 @@ function Config:GetAllValuesStringified(p1) end
 --- @class Cylinder
 Cylinder = {}
 
---- @return Shape
-function Cylinder.new() end
-
---- @param p1 Vec3
---- @param p2 number
---- @return Shape
-function Cylinder.new(p1, p2) end
-
---- @param p1 Vec3
---- @return Shape
-function Cylinder.new(p1) end
-
---- @return Shape
-function Cylinder.new() end
+--- @return Cylinder
+function Cylinder() end
 
 --- @param p1 Vec3
 --- @param p2 Vec3
 --- @param p3 number
 --- @param p4 number
---- @return Shape
-function Cylinder.new(p1, p2, p3, p4) end
+--- @return Cylinder
+function Cylinder(p1, p2, p3, p4) end
 
 --- @param p1 Vec3
 --- @param p2 Vec3
---- @return Shape
-function Cylinder.new(p1, p2) end
+--- @return Cylinder
+function Cylinder(p1, p2) end
 
---- @return Shape
-function Cylinder.new() end
+--[[
+`Client`
+`Server`
 
---- @param p1 Vec3
---- @param p2 Vec3
---- @param p3 number
---- @param p4 number
---- @return Shape
-function Cylinder.new(p1, p2, p3, p4) end
-
---- @param p1 Vec3
---- @param p2 Vec3
---- @return Shape
-function Cylinder.new(p1, p2) end
+[View Documentation](https://docs.atomontage.com/api/File)
+]]
+--- @class File
+--- @field filename string
+--- @field type string
+--- @field url string
+--- @field available boolean
+File = {}
 
 --[[
 `Client`
@@ -1606,6 +1598,10 @@ function Input:VRIndexTrigger(p1) end
 --- @param p1 integer
 --- @return Vec2
 function Input:VRThumbStick(p1) end
+
+--- @param p1 integer
+--- @return Vec2
+function Input:VRTrackpad(p1) end
 
 --- @param p1 integer
 --- @return boolean
@@ -2441,13 +2437,26 @@ function Object:GetRefCount() end
 `Client`
 `Server`
 
+[View Documentation](https://docs.atomontage.com/api/Overlap)
+]]
+--- @class Overlap
+--- @field bounds Box3f
+--- @field center Vec3
+--- @field radius number
+--- @field object Object
+Overlap = {}
+
+--[[
+`Client`
+`Server`
+
 [View Documentation](https://docs.atomontage.com/api/Polygon)
 ]]
 --- @class Polygon
 Polygon = {}
 
---- @return Shape
-function Polygon.new() end
+--- @return Polygon
+function Polygon() end
 
 --[[
 `Client`
@@ -2475,7 +2484,16 @@ Quat = {}
 --- @return Quat
 function Quat() end
 
---- @param p1 Quat
+--- @param p1 number
+--- @param p2 Vec3
+--- @return Quat
+function Quat(p1, p2) end
+
+--- @param p1 Mat4
+--- @return Quat
+function Quat(p1) end
+
+--- @param p1 Mat3
 --- @return Quat
 function Quat(p1) end
 
@@ -2486,29 +2504,9 @@ function Quat(p1) end
 --- @return Quat
 function Quat(p1, p2, p3, p4) end
 
---- @param p1 number
---- @param p2 Vec3
---- @return Quat
-function Quat(p1, p2) end
-
---- @param p1 Mat3
+--- @param p1 Quat
 --- @return Quat
 function Quat(p1) end
-
---- @param p1 Mat4
---- @return Quat
-function Quat(p1) end
-
---- @param p1 Quat
---- @param p2 integer
---- @return number
-function Quat:__index(p1, p2) end
-
---- @param p1 Quat
---- @param p2 integer
---- @param p3 number
---- @return nil
-function Quat:__newindex(p1, p2, p3) end
 
 --- @param p1 Quat
 --- @param p2 Quat
@@ -2566,6 +2564,9 @@ function Quat:__eq(p1, p2) end
 
 --- @return number
 function Quat:Len() end
+
+--- @return number
+function Quat:Length() end
 
 --- @return number
 function Quat:SqrLength() end
@@ -2844,22 +2845,20 @@ function Scene:TraceRay(p1) end
 --- @return Vec3
 function Scene:ConvertWcToDc(p1, p2) end
 
---- @param p1 this_state
---- @param p2 VoxelRenderer
---- @param p3 table
+--- @param p1 VoxelRenderer
+--- @param p2 table
 --- @return table
-function Scene:ConvertWcToDc(p1, p2, p3) end
+function Scene:ConvertWcToDc(p1, p2) end
 
 --- @param p1 VoxelRenderer
 --- @param p2 Vec3
 --- @return Vec3
 function Scene:ConvertDcToWc(p1, p2) end
 
---- @param p1 this_state
---- @param p2 VoxelRenderer
---- @param p3 table
+--- @param p1 VoxelRenderer
+--- @param p2 table
 --- @return table
-function Scene:ConvertDcToWc(p1, p2, p3) end
+function Scene:ConvertDcToWc(p1, p2) end
 
 --- @param p1 string
 --- @return boolean
@@ -3076,6 +3075,21 @@ function Server:HttpPost(p1, p2, p3, p4) end
 --- @return nil
 function Server:HttpGet(p1, p2, p3) end
 
+--- @param p1 string
+--- @param p2 table
+--- @param p3 userdata
+--- @return nil
+function Server:HttpDownload(p1, p2, p3) end
+
+--- @param p1 File
+--- @param p2 string
+--- @return boolean
+function Server:MoveFileToMontageVoxelsFolder(p1, p2) end
+
+--- @param p1 File
+--- @return nil
+function Server:MakeUrlForFile(p1) end
+
 --- @return AssetManager
 function Server:GetResourceManScene() end
 
@@ -3095,6 +3109,9 @@ function Server:GetLogTimers(p1) end
 
 --- @return table
 function Server:GetStreamingStats() end
+
+--- @return table
+function Server:GetMainDispatcherStats() end
 
 --- @return nil
 function Server:TriggerCrash() end
@@ -3168,6 +3185,9 @@ function Server:ShowAllNormalsPerVoxel(p1) end
 --- @return boolean
 function Server:ShowAllNormalsPerBT(p1) end
 
+--- @return nil
+function Server:PBRTranscodeToPBR0Ver1() end
+
 --[[
 `Client`
 `Server`
@@ -3216,17 +3236,17 @@ Sky = {}
 --- @class Sphere
 Sphere = {}
 
---- @return Shape
-function Sphere.new() end
+--- @return Sphere
+function Sphere() end
 
 --- @param p1 Vec3
 --- @param p2 number
---- @return Shape
-function Sphere.new(p1, p2) end
+--- @return Sphere
+function Sphere(p1, p2) end
 
 --- @param p1 Vec3
---- @return Shape
-function Sphere.new(p1) end
+--- @return Sphere
+function Sphere(p1) end
 
 --[[
 `Client`
@@ -3546,6 +3566,9 @@ function Vec2:__eq(p1, p2) end
 
 --- @return number
 function Vec2:Len() end
+
+--- @return number
+function Vec2:Length() end
 
 --- @return number
 function Vec2:SqrLength() end
@@ -3895,6 +3918,9 @@ function Vec2i:__eq(p1, p2) end
 
 --- @return integer
 function Vec2i:Len() end
+
+--- @return integer
+function Vec2i:Length() end
 
 --- @return integer
 function Vec2i:SqrLength() end
@@ -4326,6 +4352,9 @@ function Vec3:__eq(p1, p2) end
 function Vec3:Len() end
 
 --- @return number
+function Vec3:Length() end
+
+--- @return number
 function Vec3:SqrLength() end
 
 --- @return boolean
@@ -4736,6 +4765,9 @@ function Vec3i:__eq(p1, p2) end
 
 --- @return integer
 function Vec3i:Len() end
+
+--- @return integer
+function Vec3i:Length() end
 
 --- @return integer
 function Vec3i:SqrLength() end
@@ -5386,6 +5418,9 @@ function Vec4:__eq(p1, p2) end
 function Vec4:Len() end
 
 --- @return number
+function Vec4:Length() end
+
+--- @return number
 function Vec4:SqrLength() end
 
 --- @return boolean
@@ -6009,6 +6044,9 @@ function Vec4i:__eq(p1, p2) end
 function Vec4i:Len() end
 
 --- @return integer
+function Vec4i:Length() end
+
+--- @return integer
 function Vec4i:SqrLength() end
 
 --- @return boolean
@@ -6538,29 +6576,26 @@ function VoxelDB:CopyTo(p1) end
 --- @return boolean
 function VoxelDB:Save(p1, p2, p3) end
 
---- @param p1 this_state
---- @param p2 Vec3
+--- @param p1 Vec3
+--- @param p2 integer
 --- @param p3 integer
---- @param p4 integer
 --- @return userdata
-function VoxelDB:InspectNormals(p1, p2, p3, p4) end
+function VoxelDB:InspectNormals(p1, p2, p3) end
 
---- @param p1 this_state
---- @param p2 Vec3
+--- @param p1 Vec3
+--- @param p2 integer
 --- @param p3 integer
---- @param p4 integer
---- @param p5 table
---- @param p6 integer
+--- @param p4 table
+--- @param p5 integer
 --- @return userdata
-function VoxelDB:Inspect(p1, p2, p3, p4, p5, p6) end
+function VoxelDB:Inspect(p1, p2, p3, p4, p5) end
 
 --- @return integer
 function VoxelDB:GetLODsCount() end
 
---- @param p1 this_state
---- @param p2 string
+--- @param p1 string
 --- @return table
-function VoxelDB:GetLayerStats(p1, p2) end
+function VoxelDB:GetLayerStats(p1) end
 
 --- @return table
 function VoxelDB:GetUsedLayers() end
@@ -6619,14 +6654,14 @@ VoxelDataResource = {
 --- @param p1 string
 --- @param p2 boolean
 --- @return VoxelDataResource
-function VoxelDataResource.new(p1, p2) end
+function VoxelDataResource(p1, p2) end
 
 --- @return VoxelDataResource
-function VoxelDataResource.new() end
+function VoxelDataResource() end
 
 --- @param p1 string
 --- @return VoxelDataResource
-function VoxelDataResource.new(p1) end
+function VoxelDataResource(p1) end
 
 --[[
 save voxel data in AM file
@@ -6680,6 +6715,7 @@ function VoxelDataResource:RebuildLighting() end
 --- @field onFinished userdata
 --- @field onError userdata
 VoxelEdit = {
+	shape = nil,   ---if shape is nil the operation will match all targets
 	onProgress = nil, ---callback function. progress from 0-1. May not be called every frame. Is called after script updates
 	onFinished = nil, ---callback function. onFinished is called after onProgress if it was last part
 }
@@ -6882,6 +6918,13 @@ DepthBufferMode = {
 	DepthAndStencil = 2,
 }
 
+--- @enum Device
+Device = {
+	Generic = 0,
+	Quest = 1,
+	MagicLeap2 = 2,
+}
+
 --- @enum DrawingCommandsFlags
 DrawingCommandsFlags = {
 	BaseVertex = 0,
@@ -7013,6 +7056,7 @@ RendererStateFlags = {
 	Lighting = 3,
 	DepthPass = 4,
 	VR = 5,
+	PBR = 6,
 }
 
 --[[
@@ -7210,6 +7254,7 @@ VRControllerButton = {
 	Thumb = 3,
 	Trigger = 4,
 	Grip = 5,
+	Shoulder = 6,
 }
 
 --- @enum VSyncMode
