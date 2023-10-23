@@ -24,11 +24,16 @@ export function setUserThirdPartyAllWorkspaceFolders(folder: string, enable: boo
 export function setUserThirdParty(config: vscode.WorkspaceConfiguration, folder: string, enable: boolean) {
 	// get id like this? context.extension.id
 	const extensionId = "AtomontageInc.vscode-atomontage-lua";
-	const extensionPath = vscode.extensions.getExtension(extensionId)?.extensionPath;
-	const folderPath = extensionPath + "\\" + folder;
+	const extensionPath: string | undefined = vscode.extensions.getExtension(extensionId)?.extensionPath;
 
 	const library: string[] | undefined = config.get("workspace.userThirdParty");
 	if (library && extensionPath) {
+
+		// create the full path to the am_library
+		const extensionUri: vscode.Uri = vscode.Uri.file(extensionPath!);
+		const folderUri: vscode.Uri = vscode.Uri.joinPath(extensionUri, folder);
+		const folderPath: string = folderUri.fsPath;
+
 		// remove any older versions of our path e.g. "publisher.name-0.0.1"
 		for (let i = library.length - 1; i >= 0; i--) {
 			const el = library[i];
