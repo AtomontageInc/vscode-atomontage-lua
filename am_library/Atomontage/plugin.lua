@@ -40,6 +40,16 @@ function OnSetText(uri, text)
                 text = string.format("--- @class %s:ScriptInstance\n", className),
             })
         end
+        
+        --remove spaces from FindScript since they had to be removed from class naems obove
+        for pos1, scriptName, pos2 in text:gmatch([[FindScript%(()([%w%s%"%[%]%'-_]+)()%)]]) do
+            local scriptName = scriptName:gsub("%s+", "")
+            table.insert(diffs, {
+                start = pos1,
+                finish = pos2-1,
+                text = scriptName,
+            })
+        end
     end
 
     --insert this empty diff to also remove other diff if it doesnt match anymore
