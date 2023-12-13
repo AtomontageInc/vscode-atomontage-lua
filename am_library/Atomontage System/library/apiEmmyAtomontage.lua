@@ -256,11 +256,13 @@
 --- @return Hit[]
 function Scene:TraceRay(p1) end
 
+
 --- @return nil
 function ScriptInstance:OnActivate() end
 
 --- @return nil
 function ScriptInstance:OnDeactivate() end
+
 
 --- @return Filter
 function Filter.new() end
@@ -271,6 +273,7 @@ function Collision.new() end
 --- @return VoxelEdit
 function VoxelEdit.new() end
 
+
 --- @return Hit[]
 function Collision:Raycast() end
 
@@ -278,6 +281,7 @@ function Collision:Raycast() end
 --- @param p2 Vec3
 --- @return Hit[]
 function Collision:Raycast(p1, p2) end
+
 
 --- @generic T:Component
 --- @param type `T`|componentType
@@ -294,6 +298,12 @@ function Object:GetComponentByType(name) end
 --- @return ComponentType[]
 function Object:GetComponentsByType(name) end
 
+--- @generic ScriptInstanceType: ScriptInstance
+--- @param name `ScriptInstanceType`
+--- @return ScriptInstanceType
+function Object:FindScript(name) end
+
+
 --- @param p1 string
 --- @return Object[]
 function Scene:GetObjectsByName(p1) end
@@ -308,8 +318,10 @@ function Scene:GetRootObjects() end
 --- @return Object[]
 function Scene:GetObjectsByTag(p1) end
 
+
 --- @return number[]
 function Server:GetClients() end
+
 
 --- @param p1 integer
 --- @return Transform
@@ -318,6 +330,7 @@ function Transform:GetChild(p1) end
 --- @param p1 string
 --- @return Transform
 function Transform:GetChild(p1) end
+
 
 --- @param p1 keyCode
 --- @return boolean
@@ -345,6 +358,7 @@ function Input:MouseButton(p1) end
 --- @param p1 mouseButton
 --- @return boolean
 function Input:MouseButtonUp(p1) end
+
 
 --- @param p1 Vec3
 --- @return Quat
@@ -383,9 +397,11 @@ function Quat.AngleAxis(p1, p2) end
 --- @return Vec3
 function Vec3.Lerp(p1, p2, p3) end
 
+
 --- @return Vec3
 function Quat:GetEuler() end
 
+
 --- @param p2 number
 --- @param p3 number
 --- @return nil
@@ -406,6 +422,7 @@ function Vec2:GetClamped(p2, p3) end
 --- @return Vec2
 function Vec2:GetClamped(p2, p3) end
 
+
 --- @param p2 number
 --- @param p3 number
 --- @return nil
@@ -425,10 +442,12 @@ function Vec3:GetClamped(p2, p3) end
 --- @param p3 Vec3
 --- @return Vec3
 function Vec3:GetClamped(p2, p3) end
+
 
 --- @param p1 string
 --- @return Material
 function Scene:CreateMaterial(p1) end
+
 
 --- @param text string
 --- @param pos Vec2 0-1
@@ -440,17 +459,20 @@ function Scene:CreateMaterial(p1) end
 --- @return nil
 function Client:WriteToScreen(text, pos, pivot, color, size, colorOutline, p7) end
 
+
 --- @param hand Side
 --- @param duration number in seconds, 0 <= minimal
 --- @param frequency number Hz, 0 = unspecified
 --- @param amplitude number 0-1
 --- @return nil
-function Client:ApplyVRHapticFeedback(p1, p2, p3, p4) end
+function Client:ApplyVRHapticFeedback(hand, duration, frequency, amplitude) end
+
 
 --- @alias componentType
 ---| "'Camera'"
 ---| "'MeshData'"
 ---| "'MeshRenderer'"
+---| "'Prefab'"
 ---| "'Script'"
 ---| "'Sky'"
 ---| "'StaticVoxelData'"
@@ -585,6 +607,7 @@ This class is only available on client
 ]]
 --- @class Client
 --- @field clientID integer
+--- @field userID Guid
 --- @field mode ClientMode
 --- @field platform string
 --- @field sysInfo string
@@ -592,6 +615,9 @@ Client = {}
 
 --- @return integer
 function Client:GetID() end
+
+--- @return Guid
+function Client:GetUserID() end
 
 --- @param actionID integer
 --- @param item UIItem
@@ -706,6 +732,9 @@ function Client:GetUIScaleAuto() end
 --- @param autoScale boolean
 --- @return nil
 function Client:SetUIScaleAuto(autoScale) end
+
+--- @return string
+function Client:GetUILayout() end
 
 --- @return string
 function Client:GetMontageURL() end
@@ -986,15 +1015,24 @@ function Client:ApplyVRHapticFeedback(p1, p2, p3, p4) end
 function Client:GetVREyeTrackingSupported() end
 
 --- @param p1 number
---- @return nil
+--- @return number
 function Client:SetVRUserScale(p1) end
 
 --- @return number
 function Client:GetVRUserScale() end
 
+--- @return number
+function Client:GetVRUserScaleMin() end
+
+--- @return number
+function Client:GetVRUserScaleMax() end
+
 --- @param p1 File
 --- @return nil
 function Client:SendFile(p1) end
+
+--- @return nil
+function Client:ChooseImage() end
 
 --- @return nil
 function Client:TriggerCrash() end
@@ -1119,6 +1157,21 @@ function Client:SetTestRenderObjectEnabled(p1, p2) end
 --- @param p1 string
 --- @return boolean
 function Client:ToggleTestRenderObjectEnabled(p1) end
+
+--- @param p1 integer
+--- @param p2 number
+--- @return nil
+function Client:EnableRenderingWithFadeEffect(p1, p2) end
+
+--- @param p1 integer
+--- @param p2 number
+--- @return nil
+function Client:DisableRenderingWithFadeEffect(p1, p2) end
+
+--- @param p1 integer
+--- @param p2 number
+--- @return nil
+function Client:ToggleRenderingWithFadeEffect(p1, p2) end
 
 --[[
 `Client`
@@ -1404,6 +1457,16 @@ Filter = {
 
 --- @return Filter
 function Filter() end
+
+--- @param p1 boolean
+--- @param p2 boolean
+--- @return Filter
+function Filter(p1, p2) end
+
+--- @param p1 table
+--- @param p2 table
+--- @return Filter
+function Filter(p1, p2) end
 
 --[[
 `Client`
@@ -2350,6 +2413,7 @@ function MeshRenderer:__eq(p1, p2) end
 [View Documentation](https://docs.atomontage.com/api/Object)
 ]]
 --- @class Object
+--- @field id integer
 --- @field transform Transform
 --- @field isDestroyed boolean
 --- @field name string
@@ -2361,6 +2425,7 @@ function MeshRenderer:__eq(p1, p2) end
 --- @field children table
 --- @field childCount integer
 --- @field siblingIndex integer
+--- @field isPrefabObject boolean
 --- @field components table
 --- @field componentsCount integer
 Object = {}
@@ -2444,6 +2509,7 @@ function Object:GetRefCount() end
 --- @field center Vec3
 --- @field radius number
 --- @field object Object
+--- @field shape Shape
 Overlap = {}
 
 --[[
@@ -2786,6 +2852,9 @@ function Scene:GetObjectByName(p1) end
 --- @return table
 function Scene:GetRootObjects() end
 
+--- @return table
+function Scene:GetAllObjects() end
+
 --- @param p1 Object
 --- @return Object
 function Scene:CloneObject(p1) end
@@ -2821,6 +2890,15 @@ function Scene:MoveObjectAfter(p1, p2) end
 --- @return boolean
 function Scene:MoveObjectBefore(p1, p2) end
 
+--- @param p1 Object
+--- @return boolean
+function Scene:MoveObjectToRoot(p1) end
+
+--- @param p1 Object
+--- @param p2 Object
+--- @return boolean
+function Scene:CanMoveObject(p1, p2) end
+
 --- @param p1 string
 --- @return userdata
 function Scene:CreateMaterial(p1) end
@@ -2829,8 +2907,9 @@ function Scene:CreateMaterial(p1) end
 function Scene:GetActiveCamera() end
 
 --- @param p1 string
+--- @param p2 Object
 --- @return string
-function Scene:AddNewScriptFile(p1) end
+function Scene:AddNewScriptFile(p1, p2) end
 
 --- @param p1 string
 --- @return VoxelDB
@@ -2867,6 +2946,14 @@ function Scene:IsNameValid(p1) end
 --- @param p1 string
 --- @return string
 function Scene:MakeNameValid(p1) end
+
+--- @param p1 Object
+--- @return boolean
+function Scene:UpdatePrefab(p1) end
+
+--- @param p1 Object
+--- @return boolean
+function Scene:ResetPrefab(p1) end
 
 --- @return nil
 function Scene:RebuildLighting() end
@@ -2968,10 +3055,16 @@ Server = {}
 --- @return table
 function Server:GetClients() end
 
+--- @return table
+function Server:GetUsersID() end
+
 --- @param p1 integer
---- @param p2 string
+--- @return string
+function Server:GetUserID(p1) end
+
+--- @param p1 integer
 --- @return nil
-function Server:DisconnectClient(p1, p2) end
+function Server:DisconnectClient(p1) end
 
 --- @return integer
 function Server:GetScriptsVersion() end
@@ -2991,6 +3084,17 @@ function Server:GetLuaFilesList() end
 
 --- @return table, table
 function Server:GetVoxelFilesList() end
+
+--- @return table
+function Server:GetPrefabsList() end
+
+--- @param p1 integer
+--- @return Object
+function Server:InsertPrefab(p1) end
+
+--- @param p1 Object
+--- @return boolean
+function Server:MakePrefab(p1) end
 
 --- @return nil
 function Server:SaveScene() end
@@ -3087,8 +3191,10 @@ function Server:HttpDownload(p1, p2, p3) end
 function Server:MoveFileToMontageVoxelsFolder(p1, p2) end
 
 --- @param p1 File
+--- @param p2 userdata
+--- @param p3 userdata
 --- @return nil
-function Server:MakeUrlForFile(p1) end
+function Server:MakeUrlForFile(p1, p2, p3) end
 
 --- @return AssetManager
 function Server:GetResourceManScene() end
@@ -3135,6 +3241,20 @@ function Server:AnalyticsServer(p1, p2) end
 --- @param p3 table
 --- @return nil
 function Server:AnalyticsClient(p1, p2, p3) end
+
+--- @return nil
+function Server:TeamcityApiTest() end
+
+--- @param p1 integer
+--- @return nil
+function Server:TeamcityApiTest2(p1) end
+
+--- @return table
+function Server:GetTeamcityBuilds() end
+
+--- @param p1 integer
+--- @return table
+function Server:GetTeamcityBuild(p1) end
 
 --- @param p1 integer
 --- @return integer
@@ -6231,7 +6351,7 @@ function VoxelDB:GetMask(p1) end
 function VoxelDB:GetMask(p1, p2, p3) end
 
 --[[
-int is the neighbourhood radius, 1 means it's from pos - 1 to pos + 1,
+int is the neighbourhood radius, 1 means it's from pos - 1 to pos + 1, 
 sum of voxles in 3x3 square without center (0-26)
 it should be in range 1-8
 
@@ -6617,12 +6737,26 @@ function VoxelDB:GetBounds() end
 --- @field data VoxelDataResource
 --- @field copyOnWrite boolean
 --- @field save boolean
+--- @field unpackOnLoad boolean
+--- @field releaseResources boolean
+--- @field enforceReplaceRendSourceAndEntity boolean
+--- @field ramCopy boolean
+--- @field potScale integer
+--- @field paused boolean
+--- @field startAtMs integer
+--- @field startAtFrame number
+--- @field playbackSpeed number
 VoxelData = {
-	copyOnWrite = nil, ---make local copy of voxel data resource if edited
+	copyOnWrite = nil, ---make local copy of voxel data resource if edited 
 }
 
 --- @return VoxelData
 function VoxelData() end
+
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @return nil
+function VoxelData:Mirror(p1, p2) end
 
 --- @param p1 string
 --- @return boolean, string
@@ -6715,13 +6849,22 @@ function VoxelDataResource:RebuildLighting() end
 --- @field onFinished userdata
 --- @field onError userdata
 VoxelEdit = {
-	shape = nil,   ---if shape is nil the operation will match all targets
-	onProgress = nil, ---callback function. progress from 0-1. May not be called every frame. Is called after script updates
+	shape = nil, ---if shape is nil the operation will match all targets 
+	onProgress = nil, ---callback function. progress from 0-1. May not be called every frame. Is called after script updates 
 	onFinished = nil, ---callback function. onFinished is called after onProgress if it was last part
 }
 
 --- @return VoxelEdit
 function VoxelEdit() end
+
+--- @param p1 Shape
+--- @param p2 Vec3
+--- @return VoxelEdit
+function VoxelEdit(p1, p2) end
+
+--- @param p1 Shape
+--- @return VoxelEdit
+function VoxelEdit(p1) end
 
 --- @return nil
 function VoxelEdit:Flush() end
@@ -7347,3 +7490,4 @@ VertexComponentFormat = {
 	DoubleMat4x3 = 49,
 	DoubleMat4x4 = 50,
 }
+
