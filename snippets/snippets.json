@@ -18,7 +18,11 @@
 			"",
 			"return self"
 		],
-		"description": "Script Component with callbacks"
+		"description": "Script Component with callbacks",
+		"isFileTemplate ": true,
+		"args": {
+			"langId": "lua"
+		}
 	},
 
 	"Attach": {
