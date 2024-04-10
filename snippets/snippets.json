@@ -8,6 +8,11 @@
 		"body": [
 			"local self = {}",
 			"",
+			"function self:Attach()",
+			"self.component.syncToClients = true",
+			"\t$0",
+			"end",
+			"",
 			"function self:Start()",
 			"\t$0",
 			"end",
@@ -75,6 +80,19 @@
 			"end"
 		],
 		"description": "Script Component Update() function"
+	},
+
+	"LateUpdate": {
+		"prefix": [
+			"function self:LateUpdate(dt)",
+			"LateUpdate"
+		],
+		"body": [
+			"function self:LateUpdate(dt)",
+			"\t$0",
+			"end"
+		],
+		"description": "Script Component LateUpdate() function"
 	},
 
 	"OnActivate": {
