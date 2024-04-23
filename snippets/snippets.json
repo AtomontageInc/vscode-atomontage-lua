@@ -9,7 +9,7 @@
 			"local self = {}",
 			"",
 			"function self:Attach()",
-			"self.component.syncToClients = true",
+			"\tself.component.syncToClients = true",
 			"\t$0",
 			"end",
 			"",
