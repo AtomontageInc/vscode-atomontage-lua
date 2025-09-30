@@ -11,6 +11,22 @@
 ---| Vec3i
 ---| Mat4
 ---| Quat
+---| Object
+
+--- @alias materialName
+---| '"none"'
+---| '"gold"'
+---| '"copper"'
+---| '"silver"'
+---| '"bronze"'
+---| '"rock"'
+---| '"sand"'
+---| '"stone"'
+---| '"concrete"'
+---| '"brick"'
+---| '"mortar"'
+---| '"plaster"'
+---| '"wall_paint"'
 
 --- @alias mouseButton
 ---| 1 # left button
@@ -239,9 +255,54 @@
 ---| '"Y"'
 ---| '"Z"'
 
+
+--- @class Box:Shape
+--- @class Sphere:Shape
+--- @class Capsule:Shape
+--- @class Cylinder:Shape
+--- @class Polygon:Shape
+
+
+--- @param pos Vec3
+--- @param rot Quat
+--- @param scale Vec3
+--- @return Box
+function Box(pos, rot, scale) end
+
+--- @param pos Vec3
+--- @param scale Vec3?
+--- @return Box
+function Box(pos, scale) end
+
+
+--- @param pos1 Vec3
+--- @param pos2 Vec3
+--- @param radius number?
+--- @param radius2 number?
+--- @return Capsule
+function Capsule(pos1, pos2, radius, radius2) end
+
+
+--- @param pos1 Vec3
+--- @param pos2 Vec3
+--- @param radius number?
+--- @param radius2 number?
+--- @return Cylinder
+function Cylinder(pos1, pos2, radius, radius2) end
+
+
 --- @class Object
 --- @field children Object[]
 --- @field components Component[]
+
+
+--- @class VoxelEdit
+--- @field filter Filter
+--- @field shape Shape
+--- @field onProgress fun(progress:number) --progress 0-100
+--- @field onFinished fun()
+--- @field onError fun()
+--- @field copyResource VoxelDataResource
 
 
 --- @class TraceRayParams:table
@@ -257,23 +318,6 @@
 function Scene:TraceRay(p1) end
 
 
---- @return nil
-function ScriptInstance:OnActivate() end
-
---- @return nil
-function ScriptInstance:OnDeactivate() end
-
-
---- @return Filter
-function Filter.new() end
-
---- @return Collision
-function Collision.new() end
-
---- @return VoxelEdit
-function VoxelEdit.new() end
-
-
 --- @return Hit[]
 function Collision:Raycast() end
 
@@ -281,6 +325,14 @@ function Collision:Raycast() end
 --- @param p2 Vec3
 --- @return Hit[]
 function Collision:Raycast(p1, p2) end
+
+
+--- @return Overlap[]
+function Collision:GetOverlap() end
+
+--- @param shape Shape
+--- @return Overlap[]
+function Collision:GetOverlap(shape) end
 
 
 --- @generic T:Component
@@ -317,6 +369,14 @@ function Scene:GetRootObjects() end
 --- @param p1 string
 --- @return Object[]
 function Scene:GetObjectsByTag(p1) end
+
+--- @param capsuleStart Vec3
+--- @param capsuleEnd Vec3
+--- @param capsuleRadius number
+--- @param velocity Vec3
+--- @param size number
+--- @return nil
+function Client:AddPlayerLODPriorityBubbleShape(capsuleStart, capsuleEnd, capsuleRadius, velocity, size) end
 
 
 --- @return number[]
@@ -468,17 +528,149 @@ function Client:WriteToScreen(text, pos, pivot, color, size, colorOutline, p7) e
 function Client:ApplyVRHapticFeedback(hand, duration, frequency, amplitude) end
 
 
+
+
+
+--`Client`
+--`Server`
+
+--The object visible in the hierarchy. Every object has a transform and can have additional components attached to it.
+
+--[View Documentation](https://docs.atomontage.com/api/Object)
+--- @class Object
+--- @field transform Transform
+--- @field isDestroyed boolean
+--- @field id string
+--- @field name string
+--- @field active boolean
+--- @field activeInHierarchy boolean
+--- @field save boolean
+--- @field parent Object
+--- @field children table
+--- @field childCount integer
+--- @field siblingIndex integer
+--- @field isPrefabObject boolean
+--- @field components table
+--- @field componentsCount integer
+Object = {
+	transform = nil, ---Get the transform to modify the position, rotation and scale of the object
+	isDestroyed = nil, ---True if the object was destroyed. Note that references to this object will still be valid 
+	id = nil, ---This is id is unique across clients and server
+	active = nil, ---Set the object to be active or inactive. Inactive objects are not updated or rendered. All its children also become inactive.
+	activeInHierarchy = nil, ---Readonly. Check if the object is active in the scene. It may be inactive because a parent is inactive.
+	save = nil, ---Save this object in the hierarchy. If not saved it will be deleted after lua reset or server restart
+}
+
+--Get child object by name
+--- @param p1 string
+--- @return Object
+function Object:GetChild(p1) end
+
+--- @param p1 Guid
+--- @return Object
+function Object:GetChildById(p1) end
+
+--- @return boolean
+function Object:RemoveParent() end
+
+--- @return boolean
+function Object:IsPrefab() end
+
+--- @param p1 string
+--- @return boolean
+function Object:IsPrefab(p1) end
+
+--- @param p1 string
+--- @param p2 boolean
+--- @return Script
+function Object:AddScript(p1, p2) end
+
+--- @return MeshData
+function Object:AddMeshData() end
+
+--- @param p1 string
+--- @return VoxelData
+function Object:AddVoxelData(p1) end
+
+--- @param p1 string
+--- @return StaticVoxelData
+function Object:AddStaticVoxelData(p1) end
+
+--- @return VoxelRenderer
+function Object:AddVoxelRenderer() end
+
+--- @return Camera
+function Object:AddCamera() end
+
+--- @return Sky
+function Object:AddSkybox() end
+
+--- @param p1 string
+--- @return userdata
+function Object:AddComponent(p1) end
+
+--- @param p1 string
+--- @return boolean
+function Object:RemoveComponent(p1) end
+
+--- @param p1 userdata
+--- @return boolean
+function Object:RemoveComponent(p1) end
+
+--Find a component by type name. Returns the first component found
+--- @param p1 string
+--- @return userdata
+function Object:GetComponentByType(p1) end
+
+--Find all components by type name
+--- @param p1 string
+--- @return table
+function Object:GetComponentsByType(p1) end
+
+--Find attached script component lua table by name
+--- @param p1 string
+--- @return userdata
+function Object:FindScript(p1) end
+
+--- @return Camera
+function Object:GetCamera() end
+
+--- @return string
+function Object:GetNetworkFlow() end
+
+--- @return string
+function Object:GetScriptUpdateTime() end
+
+--- @return integer
+function Object:GetRefCount() end
+
+
 --- @alias componentType
----| "'Camera'"
----| "'MeshData'"
----| "'MeshRenderer'"
----| "'Prefab'"
----| "'Script'"
----| "'Sky'"
----| "'StaticVoxelData'"
----| "'Transform'"
----| "'VoxelData'"
----| "'VoxelRenderer'"
+---| '"Camera"'
+---| '"MeshData"'
+---| '"MeshRenderer"'
+---| '"Prefab"'
+---| '"RigidBody"'
+---| '"Script"'
+---| '"Sky"'
+---| '"StaticVoxelData"'
+---| '"Transform"'
+---| '"VoxelData"'
+---| '"VoxelRenderer"'
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Asset)
+]]
+--- @class Asset
+--- @field Name string
+--- @field Type string
+Asset = {}
+
+--- @return userdata
+function Asset:GetValue() end
 
 --[[
 `Client`
@@ -489,43 +681,12 @@ function Client:ApplyVRHapticFeedback(hand, duration, frequency, amplitude) end
 --- @class AssetManager
 AssetManager = {}
 
---- @param p1 AssetManager
---- @return userdata
-function AssetManager:GetAssets(p1) end
-
---- @param p1 string
---- @return ResResource
-function AssetManager:Get(p1) end
-
---- @param p1 type
---- @param p2 string
---- @return boolean
-function AssetManager:AddAsset(p1, p2) end
-
---- @param p1 string
---- @param p2 string
---- @return boolean
-function AssetManager:AddAsset(p1, p2) end
-
---- @param p1 ResResource
---- @return type
-function AssetManager:GetResourceType(p1) end
-
---- @param p1 type
---- @return boolean
-function AssetManager:IsAssetType(p1) end
-
---- @param p1 AssetManager
 --- @return table
-function AssetManager:GetAssetTypes(p1) end
+function AssetManager:GetAssets() end
 
---- @param p1 AssetManager
---- @return string
-function AssetManager:GetAssetsPath(p1) end
-
---- @param p1 AssetManager
---- @return string
-function AssetManager:GetFilePath(p1) end
+--- @param p1 string
+--- @return Asset
+function AssetManager:GetAsset(p1) end
 
 --[[
 `Client`
@@ -538,6 +699,17 @@ Box = {}
 
 --- @return Box
 function Box() end
+
+--[[
+Centered box
+
+[View Documentation](https://docs.atomontage.com/api/Box#Box-Vec3-Quat-Vec3)
+]]
+--- @param p1 Vec3
+--- @param p2 Quat
+--- @param p3 Vec3
+--- @return Box
+function Box(p1, p2, p3) end
 
 --- @param p1 Vec3
 --- @param p2 Vec3
@@ -558,13 +730,34 @@ function Box(p1) end
 --- @field object Object
 --- @field isDestroyed boolean
 --- @field type string
+--- @field Active boolean
+--- @field ActiveInHierarchy boolean
+--- @field Object Object
+--- @field IsDestroyed boolean
+--- @field Type string
 --- @field fovY number
-Camera = {}
+--- @field transform Transform
+Camera = {
+	object = nil, ---Reference to object instance
+	isDestroyed = nil, ---Indicates whether the object is destroyed (true) or not (false).
+	type = nil, ---Specifies the object's type as a string, useful for type identification.
+	fovY = nil, ---Defines the vertical field of view in degrees
+}
 
+--[[
+Converts a 2D screen percentage coordinate(i.e from Input:MousePosPerc()) to a 3D world space ray (Vec3), used for determining 3D locations from screen interactions.
+
+[View Documentation](https://docs.atomontage.com/api/Camera#Vec3-ScreenToWorldRay-Vec2)
+]]
 --- @param p1 Vec2
 --- @return Vec3
 function Camera:ScreenToWorldRay(p1) end
 
+--[[
+Transforms a 3D world coordinate (Vec3) to a 2D screen space percentage coordinate(range 0-1), useful for positioning ui elements like text above a 3D object on the screen.
+
+[View Documentation](https://docs.atomontage.com/api/Camera#Vec2-WorldToScreen-Vec3)
+]]
 --- @param p1 Vec3
 --- @return Vec2
 function Camera:WorldToScreen(p1) end
@@ -579,18 +772,29 @@ function Camera:WorldToScreen3f(p1) end
 
 [View Documentation](https://docs.atomontage.com/api/Capsule)
 ]]
---- @class CapsulE:Shape
+--- @class Capsule
 Capsule = {}
 
 --- @return Capsule
 function Capsule() end
 
+--[[
+Capsule between two points
+
+[View Documentation](https://docs.atomontage.com/api/Capsule#Capsule-Vec3-Vec3-number-number)
+]]
 --- @param p1 Vec3
 --- @param p2 Vec3
 --- @param p3 number
 --- @param p4 number
 --- @return Capsule
 function Capsule(p1, p2, p3, p4) end
+
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @param p3 number
+--- @return Capsule
+function Capsule(p1, p2, p3) end
 
 --- @param p1 Vec3
 --- @param p2 Vec3
@@ -610,9 +814,19 @@ This class is only available on client
 --- @field userID Guid
 --- @field mode ClientMode
 --- @field isMaker boolean
+--- @field EditMode boolean
+--- @field WannaShowLuaConsole boolean
 --- @field platform string
 --- @field sysInfo string
-Client = {}
+--- @field MasterVolume number
+--- @field SoundVolume number
+--- @field MusicVolume number
+--- @field TracyProfiler boolean
+Client = {
+	MasterVolume = nil, ---Audio volume in range 0 - 1.
+	SoundVolume = nil, ---Audio volume in range 0 - 1.
+	MusicVolume = nil, ---Audio volume in range 0 - 1.
+}
 
 --- @return integer
 function Client:GetID() end
@@ -740,26 +954,37 @@ function Client:GetUILayout() end
 --- @return string
 function Client:GetMontageURL() end
 
---- @param url string
---- @return nil
-function Client:SetMontageURL(url) end
-
 --- @return string
 function Client:GetMontageURLBase() end
 
 --- @return userdata
 function Client:GetMontageURLParameters() end
 
+--- @return string
+function Client:GetMontageURLParametersRaw() end
+
 --- @param p1 userdata
 --- @return string
 function Client:GetMontageURLWithParameters(p1) end
 
 --- @return nil
-function Client:LoadMontageByURL() end
-
---- @return nil
 function Client:CancelLoadMontageByURL() end
 
+--- @param p1 string
+--- @return nil
+function Client:ConnectToMontage(p1) end
+
+--[[
+Unknown,
+Connecting,
+FailedToConnect,
+StatusMessage,
+ReadyToAcknowledge,
+Connected,
+Disconnected
+
+[View Documentation](https://docs.atomontage.com/api/Client#string-GetConnectionStatus)
+]]
 --- @return string
 function Client:GetConnectionStatus() end
 
@@ -769,9 +994,22 @@ function Client:GetConnectionStatusDetailed() end
 --- @return nil
 function Client:Disconnect() end
 
+--[[
+Time for a network message to travel from client to server and back
+
+[View Documentation](https://docs.atomontage.com/api/Client#number-GetPing)
+]]
+--- @return number
+function Client:GetPing() end
+
 --- @param p1 string
 --- @return number
 function Client:GetLogValue(p1) end
+
+--- @param p1 string
+--- @param p2 number
+--- @return number
+function Client:GetLogValue(p1, p2) end
 
 --- @param p1 string
 --- @param p2 number
@@ -805,6 +1043,9 @@ function Client:GetLogValuesCount() end
 --- @param p1 string
 --- @return userdata
 function Client:GetLogValueForPlot(p1) end
+
+--- @return nil
+function Client:ResetTracy() end
 
 --- @param p1 string
 --- @return string
@@ -930,33 +1171,6 @@ function Client:SetIntersectionBox(p1, p2, p3) end
 --- @return nil
 function Client:SetIntersectionSphere(p1, p2) end
 
---- @param p1 string
---- @param p2 Vec2
---- @param p3 Vec2
---- @param p4 Vec4
---- @param p5 integer
---- @param p6 Vec4
---- @param p7 number
---- @return nil
-function Client:WriteToScreen(p1, p2, p3, p4, p5, p6, p7) end
-
---- @param p1 string
---- @param p2 Vec2
---- @param p3 Vec2
---- @param p4 Vec4
---- @param p5 integer
---- @return nil
-function Client:WriteToScreen(p1, p2, p3, p4, p5) end
-
---- @param p1 string
---- @param p2 Vec2
---- @param p3 Vec2
---- @param p4 Vec4
---- @param p5 integer
---- @param p6 Vec4
---- @return nil
-function Client:WriteToScreen(p1, p2, p3, p4, p5, p6) end
-
 --- @return nil
 function Client:CloseApp() end
 
@@ -970,7 +1184,7 @@ function Client:GetWindowSize() end
 function Client:GetViewportSize() end
 
 --[[
-Returns [`CommandLine`](/api/commandLine)
+Returns [`CommandLine`](./commandLine.mdx)
 
 [View Documentation](https://docs.atomontage.com/api/Client#CommandLine-GetCommandLine)
 ]]
@@ -1028,6 +1242,18 @@ function Client:GetVRUserScaleMin() end
 --- @return number
 function Client:GetVRUserScaleMax() end
 
+--- @return nil
+function Client:StartVRPassthrough() end
+
+--- @return nil
+function Client:StopVRPassthrough() end
+
+--- @return boolean
+function Client:IsVRPassthroughEnabled() end
+
+--- @return boolean
+function Client:IsVRPassthroughSupported() end
+
 --- @param p1 File
 --- @return boolean
 function Client:SendFile(p1) end
@@ -1035,6 +1261,12 @@ function Client:SendFile(p1) end
 --- @param p1 table
 --- @return boolean
 function Client:SendFiles(p1) end
+
+--- @return boolean
+function Client:IsUploadingFiles() end
+
+--- @return boolean
+function Client:IsDownloadingFiles() end
 
 --- @return nil
 function Client:Restart() end
@@ -1053,12 +1285,6 @@ function Client:TriggerCriticalError() end
 
 --- @return AssetManager
 function Client:GetResourceManScene() end
-
---- @return AssetManager
-function Client:GetResourceManUI() end
-
---- @return AssetManager
-function Client:GetResourceManSettings() end
 
 --- @return nil
 function Client:ToggleChannelRendering() end
@@ -1089,6 +1315,9 @@ function Client:ClearEntityPath() end
 
 --- @return nil
 function Client:AddEntityPathWaypoint() end
+
+--- @return table
+function Client:GetEntityPath() end
 
 --- @param p1 string
 --- @param p2 boolean
@@ -1139,6 +1368,14 @@ function Client:SetUpdateSyncMessageString(p1) end
 --- @return nil
 function Client:CopyToClipboard(p1) end
 
+--[[
+may not work on all platforms
+
+[View Documentation](https://docs.atomontage.com/api/Client#string-GetClipboardText)
+]]
+--- @return string
+function Client:GetClipboardText() end
+
 --- @param p1 string
 --- @return nil
 function Client:OpenBrowserWithURL(p1) end
@@ -1166,24 +1403,109 @@ function Client:SetTestRenderObjectEnabled(p1, p2) end
 --- @return boolean
 function Client:ToggleTestRenderObjectEnabled(p1) end
 
---- @param p1 integer
---- @param p2 number
 --- @return nil
-function Client:EnableRenderingWithFadeEffect(p1, p2) end
+function Client:ResetPlayerLODPriorityBubble() end
 
---- @param p1 integer
---- @param p2 number
---- @return nil
-function Client:DisableRenderingWithFadeEffect(p1, p2) end
+--[[
+LODs in this bubble are prioritized, should be placed around the player or camera
+params: capsuleStart, capsuleEnd, capsuleRadius, velocity, size
 
---- @param p1 integer
---- @param p2 number
+[View Documentation](https://docs.atomontage.com/api/Client#nil-AddPlayerLODPriorityBubbleShape-Vec3-Vec3-number-Vec3-number)
+]]
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @param p3 number
+--- @param p4 Vec3
+--- @param p5 number
 --- @return nil
-function Client:ToggleRenderingWithFadeEffect(p1, p2) end
+function Client:AddPlayerLODPriorityBubbleShape(p1, p2, p3, p4, p5) end
+
+--- @param p1 Vec4
+--- @return nil
+function Client:SetScreenColor(p1) end
+
+--[[
+Tint the view for this frame or permanently
+
+[View Documentation](https://docs.atomontage.com/api/Client#nil-SetScreenColor-Vec4-boolean)
+]]
+--- @param p1 Vec4
+--- @param p2 boolean
+--- @return nil
+function Client:SetScreenColor(p1, p2) end
+
+--- @param p1 string
+--- @return AudioSource
+function Client:PlaySound(p1) end
+
+--[[
+Play sound with asset name, at position, with volume and loop. Only single channel audio.
+Returns [AudioSource](./AudioSource.mdx)
+
+[View Documentation](https://docs.atomontage.com/api/Client#AudioSource-PlaySound-string-Vec3-number-boolean)
+]]
+--- @param p1 string
+--- @param p2 Vec3
+--- @param p3 number
+--- @param p4 boolean
+--- @return AudioSource
+function Client:PlaySound(p1, p2, p3, p4) end
+
+--- @param p1 string
+--- @param p2 Vec3
+--- @param p3 number
+--- @return AudioSource
+function Client:PlaySound(p1, p2, p3) end
+
+--- @param p1 string
+--- @param p2 Vec3
+--- @return AudioSource
+function Client:PlaySound(p1, p2) end
+
+--- @param p1 string
+--- @return AudioMusic
+function Client:PlayMusic(p1) end
+
+--[[
+Play sound with asset name, with volume and loop. This play stereo music without any position just like normal audio player.
+Returns [AudioMusic](./AudioMusic.mdx)
+
+[View Documentation](https://docs.atomontage.com/api/Client#AudioMusic-PlayMusic-string-number-boolean)
+]]
+--- @param p1 string
+--- @param p2 number
+--- @param p3 boolean
+--- @return AudioMusic
+function Client:PlayMusic(p1, p2, p3) end
+
+--[[
+Pause all playing sounds and music
+
+[View Documentation](https://docs.atomontage.com/api/Client#nil-PauseAudio)
+]]
+--- @return nil
+function Client:PauseAudio() end
+
+--[[
+Resume all paused sounds and music
+
+[View Documentation](https://docs.atomontage.com/api/Client#nil-ResumeAudio)
+]]
+--- @return nil
+function Client:ResumeAudio() end
+
+--- @return nil
+function Client:StopAudio() end
 
 --[[
 `Client`
 `Server`
+
+:::warning Deprecated
+The collision functions in this class are old and may not correctly work.
+Instead use `Cast:Ray()` and `Collide()`
+:::
+
 
 [View Documentation](https://docs.atomontage.com/api/Collision)
 ]]
@@ -1195,7 +1517,7 @@ function Client:ToggleRenderingWithFadeEffect(p1, p2) end
 --- @field rayPos Vec3
 --- @field rayDir Vec3
 Collision = {
-	maxHitCount = nil, ---doesn't influence result, just limits returned hits table size
+	maxHitCount = nil, ---Doesn't influence result, just limits returned hits table size
 }
 
 --- @return Collision
@@ -1205,36 +1527,28 @@ function Collision() end
 function Collision() end
 
 --[[
-use rayPos, rayDir, returns table of Hit values or empty table for no hit
+Use rayPos, rayDir, returns table of Hit values or empty table for no hit.
+Returns [Hit](Hit).
 
 [View Documentation](https://docs.atomontage.com/api/Collision#table-Raycast)
 ]]
 --- @return table
 function Collision:Raycast() end
 
---[[
-use rayPos, rayDir, returns table of Hit values or empty table for no hit
-
-[View Documentation](https://docs.atomontage.com/api/Collision#table-Raycast-Vec3-Vec3)
-]]
 --- @param p1 Vec3
 --- @param p2 Vec3
 --- @return table
 function Collision:Raycast(p1, p2) end
 
 --[[
-checks collision between shape and geometry passed by filter
+Checks collision between shape and geometry passed by filter.
+Returns [Overlap](Overlap).
 
 [View Documentation](https://docs.atomontage.com/api/Collision#table-GetOverlap)
 ]]
 --- @return table
 function Collision:GetOverlap() end
 
---[[
-checks collision between shape and geometry passed by filter
-
-[View Documentation](https://docs.atomontage.com/api/Collision#table-GetOverlap-Shape)
-]]
 --- @param p1 Shape
 --- @return table
 function Collision:GetOverlap(p1) end
@@ -1268,9 +1582,19 @@ function CommandLine:GetOptionInt(p1, p2) end
 function CommandLine:GetOption(p1, p2) end
 
 --- @param p1 string
+--- @param p2 Vec2
+--- @return Vec2
+function CommandLine:GetOptionVec2(p1, p2) end
+
+--- @param p1 string
 --- @param p2 Vec3
 --- @return Vec3
 function CommandLine:GetOptionVec3(p1, p2) end
+
+--- @param p1 string
+--- @param p2 Vec4
+--- @return Vec4
+function CommandLine:GetOptionVec4(p1, p2) end
 
 --- @param p1 CommandLine
 --- @return table
@@ -1280,17 +1604,57 @@ function CommandLine:GetAll(p1) end
 `Client`
 `Server`
 
+All components inherit from this class. It is not meant to be instantiated directly.
+* [Transform](Transform)
+* [Script](Script)
+* [Camera](Camera)
+* [VoxelData](VoxelData)
+* [StaticVoxelData](StaticVoxelData)
+* [VoxelRenderer](VoxelRenderer)
+* [MeshData](MeshRenderer)
+* [MeshRenderer](MeshRenderer)
+* [Sky](Sky)
+
 [View Documentation](https://docs.atomontage.com/api/Component)
 ]]
 --- @class Component
 --- @field object Object
 --- @field isDestroyed boolean
 --- @field type string
+--- @field Active boolean
+--- @field ActiveInHierarchy boolean
+--- @field Object Object
+--- @field IsDestroyed boolean
+--- @field Type string
 Component = {}
 
 --[[
 `Client`
 `Server`
+
+Save and load values for this client. 
+These values are stored clients local storage and will be available on all montages he visits.
+This is useful for saving settings, last player position, etc.
+
+To avoid naming conflicts with other montages, use a unique prefix for each game. For example, if your game is called "MyGame", you can use "MyGame/" as a prefix for all your keys.
+
+```lua
+Config:SetVec3("MyGame/PlayerPosition", player.transform.pos)
+```
+
+```lua
+local defaultPos = Vec3(0,0,0)
+local pos = Config:GetVec3("MyGame/PlayerPosition", defaultPos)
+player.transform.pos = pos
+```
+
+If you want to save a setting only for this montage include the montage id in the setting
+```lua
+--extract id from url
+local url = Client:GetMontageURL()
+local id, params = string.match(url, "/view%?m=([%w%-%_]*)(.*)")
+Config:SetFloat(id.."/MyGame/Highscore", highscore)
+```
 
 [View Documentation](https://docs.atomontage.com/api/Config)
 ]]
@@ -1343,10 +1707,10 @@ function Config:Exists(p1) end
 --[[
 force saving Config
 
-[View Documentation](https://docs.atomontage.com/api/Config#nil-EmitChangeSignal)
+[View Documentation](https://docs.atomontage.com/api/Config#nil-Save)
 ]]
 --- @return nil
-function Config:EmitChangeSignal() end
+function Config:Save() end
 
 --- @param p1 string
 --- @return integer
@@ -1427,6 +1791,11 @@ Cylinder = {}
 --- @return Cylinder
 function Cylinder() end
 
+--[[
+Cylinder between two points
+
+[View Documentation](https://docs.atomontage.com/api/Cylinder#Cylinder-Vec3-Vec3-number-number)
+]]
 --- @param p1 Vec3
 --- @param p2 Vec3
 --- @param p3 number
@@ -1436,8 +1805,28 @@ function Cylinder(p1, p2, p3, p4) end
 
 --- @param p1 Vec3
 --- @param p2 Vec3
+--- @param p3 number
+--- @return Cylinder
+function Cylinder(p1, p2, p3) end
+
+--- @param p1 Vec3
+--- @param p2 Vec3
 --- @return Cylinder
 function Cylinder(p1, p2) end
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Effect)
+]]
+--- @class Effect
+--- @field LineWidth number
+Effect = {}
+
+--- @param p1 string
+--- @return Effect
+function Effect(p1) end
 
 --[[
 `Client`
@@ -1488,6 +1877,45 @@ function Filter(p1, p2) end
 `Client`
 `Server`
 
+[View Documentation](https://docs.atomontage.com/api/Gamepad)
+]]
+--- @class Gamepad
+Gamepad = {}
+
+--- @param p1 integer
+--- @return boolean
+function Gamepad:ButtonDown(p1) end
+
+--- @param p1 integer
+--- @return boolean
+function Gamepad:Button(p1) end
+
+--- @param p1 integer
+--- @return boolean
+function Gamepad:ButtonUp(p1) end
+
+--- @param p1 integer
+--- @return number
+function Gamepad:Axis(p1) end
+
+--- @param p1 integer
+--- @param p2 integer
+--- @param p3 integer
+--- @return integer
+function Gamepad:Rumble(p1, p2, p3) end
+
+--- @param p1 integer
+--- @param p2 integer
+--- @param p3 integer
+--- @return integer
+function Gamepad:RumbleTriggers(p1, p2, p3) end
+
+--[[
+`Client`
+`Server`
+
+Returned by [raycasts](Collision#table-Raycast).
+
 [View Documentation](https://docs.atomontage.com/api/Hit)
 ]]
 --- @class Hit
@@ -1496,12 +1924,20 @@ function Filter(p1, p2) end
 --- @field color Vec3
 --- @field object Object
 --- @field distance number
+--- @field material string
 --- @field type HitType
 Hit = {}
 
 --[[
 `Client`
 `Server`
+:::info Client Only
+Input from this class can only be read on the client side.
+:::
+
+Simple way to check a clients input.
+For more advanced use we recommend receive input via the [events system](../manual/scripting/examples/Input) 
+because it respects the order in which the input was received and other benefits. 
 
 [View Documentation](https://docs.atomontage.com/api/Input)
 ]]
@@ -1634,7 +2070,7 @@ function Input:NumFingers() end
 --[[
 int passed is the unique ID of that touch obtained i.e. from Input:Fingers() or Input:GetEvents()
 
-[View Documentation](https://docs.atomontage.com/api/Input#bool-FingerDown-int)
+[View Documentation](https://docs.atomontage.com/api/Input#boolean-FingerDown-integer)
 ]]
 --- @param p1 integer
 --- @return boolean
@@ -1699,6 +2135,11 @@ function Input:VRControllerDir(p1) end
 --- @return Vec3, Quat
 function Input:VRControllerTransform(p1, p2) end
 
+--- @param p1 integer
+--- @param p2 Space
+--- @return Vec3, Quat
+function Input:VRPointerTransform(p1, p2) end
+
 --- @return userdata
 function Input:Gamepads() end
 
@@ -1714,6 +2155,15 @@ function Input:GetActiveGamepad() end
 --- @class LightingUpdate
 --- @field realtimeLighting RealtimeLightingInfo
 LightingUpdate = {}
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Mat3)
+]]
+--- @class Mat3
+Mat3 = {}
 
 --[[
 `Client`
@@ -1935,6 +2385,15 @@ function Mat3:IsSingular() end
 
 --- @return boolean
 function Mat3:IsAnyNaN() end
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Mat4)
+]]
+--- @class Mat4
+Mat4 = {}
 
 --[[
 `Client`
@@ -2168,11 +2627,6 @@ function Mat4:__mul(p1, p2) end
 --- @return Mat4
 function Mat4:__mul(p1, p2) end
 
---- @param p1 Vec4
---- @param p2 Mat4
---- @return Vec4
-function Mat4:__mul(p1, p2) end
-
 --- @param p1 Mat4
 --- @param p2 Mat4
 --- @return Mat4
@@ -2299,17 +2753,12 @@ function Mat4:Ortho(p1, p2, p3, p4, p5, p6) end
 [View Documentation](https://docs.atomontage.com/api/Material)
 ]]
 --- @class Material
+--- @field Effect Effect
 Material = {}
 
 --- @param p1 string
 --- @return Material
 function Material(p1) end
-
---- @return boolean
-function Material:IsValid() end
-
---- @return boolean
-function Material:IsManaged() end
 
 --- @param p1 Material
 --- @param p2 string
@@ -2348,6 +2797,11 @@ function Material:SetProperty(p1, p2, p3) end
 --- @field object Object
 --- @field isDestroyed boolean
 --- @field type string
+--- @field Active boolean
+--- @field ActiveInHierarchy boolean
+--- @field Object Object
+--- @field IsDestroyed boolean
+--- @field Type string
 --- @field resourceUsageMode ResourceUsage
 --- @field topology PrimitiveTopology
 MeshData = {}
@@ -2414,6 +2868,11 @@ function MeshData:AddShape(p1, p2) end
 --- @field object Object
 --- @field isDestroyed boolean
 --- @field type string
+--- @field Active boolean
+--- @field ActiveInHierarchy boolean
+--- @field Object Object
+--- @field IsDestroyed boolean
+--- @field Type string
 --- @field material Material
 MeshRenderer = {}
 
@@ -2426,102 +2885,11 @@ function MeshRenderer:__eq(p1, p2) end
 `Client`
 `Server`
 
-[View Documentation](https://docs.atomontage.com/api/Object)
-]]
---- @class Object
---- @field id integer
---- @field transform Transform
---- @field isDestroyed boolean
---- @field name string
---- @field active boolean
---- @field activeInHierarchy boolean
---- @field save boolean
---- @field tag string
---- @field parent Object
---- @field children table
---- @field childCount integer
---- @field siblingIndex integer
---- @field isPrefabObject boolean
---- @field components table
---- @field componentsCount integer
-Object = {}
-
---- @param p1 string
---- @return Object
-function Object:GetChild(p1) end
-
---- @return boolean
-function Object:RemoveParent() end
-
---- @param p1 string
---- @param p2 boolean
---- @return Script
-function Object:AddScript(p1, p2) end
-
---- @return MeshData
-function Object:AddMeshData() end
-
---- @param p1 string
---- @return VoxelData
-function Object:AddVoxelData(p1) end
-
---- @param p1 string
---- @return StaticVoxelData
-function Object:AddStaticVoxelData(p1) end
-
---- @return VoxelRenderer
-function Object:AddVoxelRenderer() end
-
---- @return Camera
-function Object:AddCamera() end
-
---- @return Sky
-function Object:AddSkybox() end
-
---- @param p1 string
---- @return userdata
-function Object:AddComponent(p1) end
-
---- @param p1 string
---- @return boolean
-function Object:RemoveComponent(p1) end
-
---- @param p1 userdata
---- @return boolean
-function Object:RemoveComponent(p1) end
-
---- @param p1 string
---- @return userdata
-function Object:GetComponentByType(p1) end
-
---- @param p1 string
---- @return table
-function Object:GetComponentsByType(p1) end
-
---- @param p1 string
---- @return userdata
-function Object:FindScript(p1) end
-
---- @return Camera
-function Object:GetCamera() end
-
---- @return string
-function Object:GetNetworkFlow() end
-
---- @return string
-function Object:GetScriptUpdateTime() end
-
---- @return integer
-function Object:GetRefCount() end
-
---[[
-`Client`
-`Server`
+Returned by [`Overlap()` functions]](Collision#table-GetOverlap).
 
 [View Documentation](https://docs.atomontage.com/api/Overlap)
 ]]
 --- @class Overlap
---- @field bounds Box3f
 --- @field center Vec3
 --- @field radius number
 --- @field object Object
@@ -2539,6 +2907,27 @@ Polygon = {}
 
 --- @return Polygon
 function Polygon() end
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Polyhedron)
+]]
+--- @class Polyhedron
+Polyhedron = {}
+
+--- @return Polyhedron
+function Polyhedron() end
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/Quat)
+]]
+--- @class Quat
+Quat = {}
 
 --[[
 `Client`
@@ -2796,10 +3185,60 @@ RealtimeLightingInfo = {}
 `Client`
 `Server`
 
-[View Documentation](https://docs.atomontage.com/api/ResResource)
+[View Documentation](https://docs.atomontage.com/api/RigidBody)
 ]]
---- @class ResResource
-ResResource = {}
+--- @class RigidBody
+--- @field object Object
+--- @field isDestroyed boolean
+--- @field type string
+--- @field Active boolean
+--- @field ActiveInHierarchy boolean
+--- @field Object Object
+--- @field IsDestroyed boolean
+--- @field Type string
+--- @field Velocity Vec3
+--- @field AngularVelocity Vec3
+--- @field Mass number
+--- @field MassByObject boolean
+--- @field Inertia Vec3
+--- @field InertiaByObject boolean
+--- @field InertiaMul number
+--- @field Sleeping boolean
+--- @field StartSleeping boolean
+--- @field AllowSleeping boolean
+--- @field CenterOfMass Vec3
+--- @field GravityScale number
+RigidBody = {}
+
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @return nil
+function RigidBody:AddImpulse(p1, p2) end
+
+--- @param p1 Vec3
+--- @return nil
+function RigidBody:AddAngularImpulse(p1) end
+
+--- @param p1 Vec3
+--- @return nil
+function RigidBody:AddForce(p1) end
+
+--- @param p1 Vec3
+--- @return nil
+function RigidBody:AddTorque(p1) end
+
+--- @param p1 Vec3
+--- @return nil
+function RigidBody:AddAcceleration(p1) end
+
+--- @param p1 Vec3
+--- @return nil
+function RigidBody:AddAngularAcceleration(p1) end
+
+--- @param p1 RigidBody
+--- @param p2 RigidBody
+--- @return boolean
+function RigidBody:__eq(p1, p2) end
 
 --[[
 `Client`
@@ -2808,13 +3247,30 @@ ResResource = {}
 [View Documentation](https://docs.atomontage.com/api/Scene)
 ]]
 --- @class Scene
+--- @field VoxelDataResourceTemplateSizeThreshold integer
 --- @field lighting LightingUpdate
 --- @field objectLighting LightingUpdate
+--- @field SimulationPaused boolean
+--- @field SimulationSpeed number
+--- @field Gravity number
 Scene = {}
 
 --- @return number
 function Scene:GetTime() end
 
+--[[
+
+Time passed since the last Update() call. Since time between updates is not constant use this to adjust changes such as movement according to the amount of time that has passed
+```lua
+function self:Update()
+    local speed = 10
+    local move = Vec3.right
+    --remember to multiply by delta time, since the time passed between each Update() is not constant
+    self.transform.pos = self.transform.pos + move * speed * Scene:GetDeltaTime() 
+end
+```
+[View Documentation](https://docs.atomontage.com/api/Scene#number-GetDeltaTime)
+]]
 --- @return number
 function Scene:GetDeltaTime() end
 
@@ -2823,6 +3279,14 @@ function Scene:GetDebugTime() end
 
 --- @return integer
 function Scene:GetCurrentFrame() end
+
+--[[
+What is currently being processed i.e Start, Update, LateUpdate etc.
+
+[View Documentation](https://docs.atomontage.com/api/Scene#string-GetProcessState)
+]]
+--- @return string
+function Scene:GetProcessState() end
 
 --- @return Object
 function Scene:CreateObject() end
@@ -2849,10 +3313,31 @@ function Scene:CreateObject(p1, p2) end
 --- @return Object
 function Scene:CreateObject(p1) end
 
+--[[
+Create an object on server or client. The object is not automatically synced to clients unless its set to.
+For naming we recommend to: 
+* Use capital case 
+* Use spaces between words
+* If the object only holds a script component, name the object after the script
+* Avoid creating multiple objects with the same name (i.e. by numbering them)
+* If the object somehow belongs to a player include the user ID in the name
+```lua
+local ob = Scene:CreateObject("Player Controller 1")
+```
+
+Also see [`Scene:MakeNameValid`](#string-MakeNameValid-string)
+
+[View Documentation](https://docs.atomontage.com/api/Scene#Object-CreateObject-string)
+]]
 --- @param p1 string
 --- @return Object
 function Scene:CreateObject(p1) end
 
+--[[
+Flags the object for deletion. The object will not actually be destroyed until the next frame.
+
+[View Documentation](https://docs.atomontage.com/api/Scene#nil-DestroyObject-Object)
+]]
 --- @param p1 Object
 --- @return nil
 function Scene:DestroyObject(p1) end
@@ -2864,6 +3349,10 @@ function Scene:GetObjectsByName(p1) end
 --- @param p1 string
 --- @return Object
 function Scene:GetObjectByName(p1) end
+
+--- @param p1 string
+--- @return Object
+function Scene:GetObjectById(p1) end
 
 --- @return table
 function Scene:GetRootObjects() end
@@ -2922,6 +3411,10 @@ function Scene:CreateMaterial(p1) end
 --- @return Camera
 function Scene:GetActiveCamera() end
 
+--- @param p1 Camera
+--- @return nil
+function Scene:SetActiveCamera(p1) end
+
 --- @param p1 string
 --- @param p2 Object
 --- @return string
@@ -2972,6 +3465,13 @@ function Scene:UpdatePrefab(p1) end
 function Scene:ResetPrefab(p1) end
 
 --- @return nil
+function Scene:ResetAllPrefabs() end
+
+--- @param p1 Object
+--- @return nil
+function Scene:UnpackPrefab(p1) end
+
+--- @return nil
 function Scene:RebuildLighting() end
 
 --- @param p1 string
@@ -2996,16 +3496,30 @@ function Scene:GetVDRStats() end
 `Client`
 `Server`
 
+Script component. Not to be confused with the actual [lua table instance](ScriptInstance) of the script referred to as `self`.
+
 [View Documentation](https://docs.atomontage.com/api/Script)
 ]]
 --- @class Script
 --- @field object Object
 --- @field isDestroyed boolean
 --- @field type string
+--- @field Active boolean
+--- @field ActiveInHierarchy boolean
+--- @field Object Object
+--- @field IsDestroyed boolean
+--- @field Type string
 --- @field instance table
+--- @field Instance table
 --- @field name string
+--- @field Name string
 --- @field file string
+--- @field File string
 --- @field syncToClients boolean
+--- @field SyncToClients boolean
+--- @field priority integer
+--- @field Priority integer
+--- @field LuaFile Asset
 Script = {}
 
 --- @vararg any
@@ -3022,6 +3536,82 @@ function Script:GetScriptUpdateTime() end
 `Client`
 `Server`
 
+The lua table referred to in a script with `self`
+The [`Script`](Script) component attached to the object can be found via `self.component`.
+
+```lua
+local self = {}
+
+--Called once on object creation before Start()
+function self:Attach()
+end
+
+--Called once on object creation after Attach()
+function self:Start()
+end
+
+--Called once a frame after Start() if the object is active
+function self:Update(dt)
+end
+
+--Called after Update(), before rendering
+function self:LateUpdate()
+end
+
+function self:OnActivate()
+end
+
+function self:OnDeactivate()
+end
+
+--Called when script component or object is destroyed
+function self:Detach()
+end
+
+return self
+```
+
+### Script Lifecycle
+The rules:
+* The script is loaded and `Attach()` is called right away, even if the object is inactive
+* If the object is active `Start()` etc is called one frame later. Currently only on server this may change in the future  
+* Each step is done for all applicable objects in a row i.e load all scripts, `Attach()` all objects, `Start()` all active objects
+* Never call `OnActivate()` `OnDeactivate()` before `Start()`
+* Never call `OnDeactivate()` if `OnActivate()` has not been called
+
+```mermaid
+---
+title: Script Lifecycle
+---
+graph TD;
+    C([Script component loaded via scene or created at runtime])-->L
+    
+subgraph Immediately
+    L["Load scripts"]-->A;
+end
+subgraph NextFrame
+
+    A["Attach()"]-- if active -->S;
+    S["Start()"]-- if active -->OA;
+
+    OA["OnActivate()"]-- if active -->U;
+    OA["OnActivate()"]-- if inactive, next frame -->OD;
+
+
+    U["Update()"]-->LU;
+    LU["LateUpdate()"]--every frame-->U;
+    LU["LateUpdate()"]--deactivated, next frame-->OD;
+
+    OD["OnDeactivate()"]--activated, next frame-->OA;
+end
+
+    NextFrame -->DEL;
+
+    DEL([Flagged for deletion at any step])-->D
+
+    D["Detach()"] --> *([Destroy Script Component]);
+```
+
 [View Documentation](https://docs.atomontage.com/api/ScriptInstance)
 ]]
 --- @class ScriptInstance
@@ -3030,26 +3620,125 @@ function Script:GetScriptUpdateTime() end
 --- @field transform Transform
 --- @field onServer boolean
 --- @field onClient boolean
-ScriptInstance = {}
+--- @field Component Script
+--- @field Object Object
+--- @field Transform Transform
+--- @field OnServer boolean
+--- @field OnClient boolean
+ScriptInstance = {
+	component = nil, ---The script component, separate from the lua table
+	object = nil, ---The object this script is attached to
+	transform = nil, ---The transform of the object this script is attached to
+	onServer = nil, ---Use this to run part of the code only on server or client```lua if self.onServer then    -- do something only on serverend```
+	onClient = nil, ---Use this to run part of the code only on server or client```lua if self.onClient then    -- do something only on clientend```import { render } from "react-dom"
+}
 
+--[[
+Called once on object creation after Attach() once the script becomes active
+
+[View Documentation](https://docs.atomontage.com/api/ScriptInstance#nil-Start)
+]]
 --- @return nil
 function ScriptInstance:Start() end
 
+--[[
+Called once a frame after Start() if the object is active 
+
+[View Documentation](https://docs.atomontage.com/api/ScriptInstance#nil-Update-number-deltaTime)
+]]
 --- @param deltaTime number
 --- @return nil
 function ScriptInstance:Update(deltaTime) end
 
+--[[
+Called once on object creation before Start() even if the script is not active
+
+[View Documentation](https://docs.atomontage.com/api/ScriptInstance#nil-Attach)
+]]
 --- @return nil
 function ScriptInstance:Attach() end
 
+--[[
+Called when script component or object is destroyed
+
+[View Documentation](https://docs.atomontage.com/api/ScriptInstance#nil-Detach)
+]]
 --- @return nil
 function ScriptInstance:Detach() end
 
+--[[
+Script active state changed through object or component. Never called before Start() 
+
+[View Documentation](https://docs.atomontage.com/api/ScriptInstance#nil-OnActivate)
+]]
+--- @return nil
+function ScriptInstance:OnActivate() end
+
+--[[
+Script active state changed through object or component. Never called before Start() and OnActivate() 
+
+[View Documentation](https://docs.atomontage.com/api/ScriptInstance#nil-OnDeactivate)
+]]
+--- @return nil
+function ScriptInstance:OnDeactivate() end
+
+--[[
+Called after Update(), before rendering
+
+[View Documentation](https://docs.atomontage.com/api/ScriptInstance#nil-LateUpdate)
+]]
+--- @return nil
+function ScriptInstance:LateUpdate() end
+
+--[[
+Call a lua function by name from server to all clients or from one client to server. You may pass parameters. 
+You may send tables and basic math types such as `Vec3` or `Quat` but other classes may not be supported.
+
+```lua
+function self:Start()
+    --remember to sync the script component to clients otherwise there is no one to receive the RPCs
+    self.component.syncToClients = true
+    self.cam = Scene:GetActiveCamera()
+
+    events.mouseButtonDown.addListener(self, function (button, from)
+        if self.onServer then return end
+        --if left mouse button pressed create a ray from mouse position and direction
+        if button == 1 then
+            local mpos = Input:MousePosPerc()
+            local tf = self.cam.object.transform
+            local pos = tf.pos + tf.forward * 1.5
+
+            --call this function on all clients with these two parameters
+            self:RPC("serverRaycast", pos, tf.forward*1000)
+        end
+    end)
+
+end
+
+function self:serverRaycast(origin, ray)
+    assert(self.onServer)
+    local hit = Collision():Raycast(origin, ray)[1]
+    if hit then
+        --make a cross at hit
+        deb:cross(hit.pos)
+        print("hit")
+    end
+end
+```
+
+
+[View Documentation](https://docs.atomontage.com/api/ScriptInstance#nil-RPC-string)
+]]
 --- @param p1 string
 --- @vararg any
 --- @return nil
 function ScriptInstance:RPC(p1, ...) end
 
+--[[
+From server call a lua function by name on one specific client
+
+[View Documentation](https://docs.atomontage.com/api/ScriptInstance#nil-RPC-integer-string)
+]]
 --- @param p1 integer
 --- @param p2 string
 --- @vararg any
@@ -3066,6 +3755,10 @@ This class is only available on server
 ]]
 --- @class Server
 --- @field clientID integer
+--- @field EditMode boolean
+--- @field ModeChangeReloadGeom boolean
+--- @field Assets AssetManager
+--- @field TracyProfiler boolean
 Server = {}
 
 --- @return table
@@ -3077,6 +3770,10 @@ function Server:GetUsersID() end
 --- @param p1 integer
 --- @return string
 function Server:GetUserID(p1) end
+
+--- @param p1 integer
+--- @return boolean
+function Server:IsVRClient(p1) end
 
 --- @param p1 integer
 --- @return nil
@@ -3095,7 +3792,7 @@ function Server:LuaReset() end
 --- @return nil
 function Server:ResendScripts() end
 
---- @return table, table
+--- @return table
 function Server:GetLuaFilesList() end
 
 --[[
@@ -3137,6 +3834,15 @@ function Server:GetPrefabsList() end
 --- @return Object
 function Server:InsertPrefab(p1) end
 
+--- @param p1 string
+--- @param p2 string
+--- @return Object
+function Server:InsertPrefab(p1, p2) end
+
+--- @param p1 string
+--- @return Object
+function Server:InsertPrefab(p1) end
+
 --- @param p1 Object
 --- @return boolean
 function Server:MakePrefab(p1) end
@@ -3147,15 +3853,11 @@ function Server:SaveScene() end
 --- @return nil
 function Server:SaveSceneHierarchy() end
 
---- @param p1 boolean
---- @return nil
-function Server:SetBackupSceneOnSave(p1) end
-
---- @return boolean
-function Server:GetBackupSceneOnSave() end
-
 --- @return nil
 function Server:ReloadScene() end
+
+--- @return nil
+function Server:BackupMontage() end
 
 --- @return nil
 function Server:OnLuaLog() end
@@ -3202,14 +3904,8 @@ function Server:GetErrors() end
 --- @return integer
 function Server:GetMaxConnections() end
 
---- @return boolean
-function Server:GetStartedWithOriginalScripts() end
-
 --- @return nil
-function Server:OverwriteWithOriginalScripts() end
-
---- @return boolean
-function Server:GetOriginalScriptsWereSet() end
+function Server:ResetTracy() end
 
 --- @param p1 string
 --- @param p2 table
@@ -3230,6 +3926,10 @@ function Server:HttpGet(p1, p2, p3) end
 --- @return nil
 function Server:HttpDownload(p1, p2, p3) end
 
+--- @param p1 integer
+--- @return number
+function Server:GetPing(p1) end
+
 --- @param p1 File
 --- @param p2 string
 --- @return boolean
@@ -3240,15 +3940,6 @@ function Server:MoveFileToMontageVoxelsFolder(p1, p2) end
 --- @param p3 userdata
 --- @return nil
 function Server:MakeUrlForFile(p1, p2, p3) end
-
---- @return AssetManager
-function Server:GetResourceManScene() end
-
---- @return AssetManager
-function Server:GetResourceManUI() end
-
---- @return AssetManager
-function Server:GetResourceManSettings() end
 
 --- @param p1 string
 --- @return number
@@ -3357,9 +4048,20 @@ function Server:PBRTranscodeToPBR0Ver1() end
 `Client`
 `Server`
 
+For [voxel edits](VoxelEdit#userdata-shape), [collisions](Collision#Shape-shape) and [rendering](MeshData#nil-AddShape-Shape-Vec4)
+
+All shapes inherit from this class. It is not meant to be instantiated directly.
+* [Box](Box)
+* [Sphere](Sphere)
+* [Capsule](Capsule)
+* [Cylinder](Cylinder)
+* [Polygon](Polygon)
+* [Polyhedron](Polyhedron)
+
 [View Documentation](https://docs.atomontage.com/api/Shape)
 ]]
 --- @class Shape
+--- @field type string
 --- @field pos Vec3
 --- @field rot Quat
 --- @field size Vec3
@@ -3372,6 +4074,9 @@ function Server:PBRTranscodeToPBR0Ver1() end
 --- @field useShellPositions boolean
 Shape = {}
 
+--- @return string
+function Shape:__typefunc() end
+
 --[[
 `Client`
 `Server`
@@ -3382,6 +4087,11 @@ Shape = {}
 --- @field object Object
 --- @field isDestroyed boolean
 --- @field type string
+--- @field Active boolean
+--- @field ActiveInHierarchy boolean
+--- @field Object Object
+--- @field IsDestroyed boolean
+--- @field Type string
 --- @field cloudScale number
 --- @field cloudOffset number
 --- @field cloudSlope number
@@ -3389,8 +4099,16 @@ Shape = {}
 --- @field sunAltitude number
 --- @field rayleighCoeff Vec3
 --- @field mieCoeff number
+--- @field yRotationAngle number
 --- @field render boolean
 Sky = {}
+
+--- @param p1 string
+--- @param p2 TextureType
+--- @param p3 Vec4
+--- @param p4 number
+--- @return nil
+function Sky:LoadSkyTexture(p1, p2, p3, p4) end
 
 --[[
 `Client`
@@ -3404,6 +4122,11 @@ Sphere = {}
 --- @return Sphere
 function Sphere() end
 
+--[[
+Centered sphere
+
+[View Documentation](https://docs.atomontage.com/api/Sphere#Sphere-Vec3-number)
+]]
 --- @param p1 Vec3
 --- @param p2 number
 --- @return Sphere
@@ -3417,12 +4140,19 @@ function Sphere(p1) end
 `Client`
 `Server`
 
+Every scene has only **one** static voxel data and can have multiple dynamic voxel data. The static voxel data is used for the world and can not be moved.
+
 [View Documentation](https://docs.atomontage.com/api/StaticVoxelData)
 ]]
 --- @class StaticVoxelData
 --- @field object Object
 --- @field isDestroyed boolean
 --- @field type string
+--- @field Active boolean
+--- @field ActiveInHierarchy boolean
+--- @field Object Object
+--- @field IsDestroyed boolean
+--- @field Type string
 --- @field path string
 --- @field isLoaded boolean
 StaticVoxelData = {}
@@ -3431,12 +4161,19 @@ StaticVoxelData = {}
 `Client`
 `Server`
 
+Holds position, rotation, and scale 
+
 [View Documentation](https://docs.atomontage.com/api/Transform)
 ]]
 --- @class Transform
 --- @field object Object
 --- @field isDestroyed boolean
 --- @field type string
+--- @field Active boolean
+--- @field ActiveInHierarchy boolean
+--- @field Object Object
+--- @field IsDestroyed boolean
+--- @field Type string
 --- @field localPos Vec3
 --- @field localScale number
 --- @field localRot Quat
@@ -3448,17 +4185,39 @@ StaticVoxelData = {}
 --- @field right Vec3
 --- @field up Vec3
 --- @field forward Vec3
-Transform = {}
+Transform = {
+	localPos = nil, ---The local position of the object relative to its parent
+	localScale = nil, ---The local scale of the object relative to its parent
+	localRot = nil, ---The local rotation of the object represented as a quaternion.
+	localEulerRot = nil, ---The local rotation of the object represented as Euler angles.
+	pos = nil, ---The global (world) position of the object
+	rot = nil, ---The global (world) rotation of the object as a quaternion
+	eulerRot = nil, ---The global (world) rotation of the object represented as Euler angles.
+	scale = nil, ---The global (world) scale of the object.
+	right = nil, ---The right direction vector of the object in world space.
+	up = nil, ---The right direction vector of the object in world space.
+	forward = nil, ---The forward direction vector of the object in world space.
+}
 
 --- @param p1 Transform
 --- @param p2 Transform
 --- @return boolean
 function Transform:__eq(p1, p2) end
 
+--[[
+Transforms a local position to world space, allowing you to convert coordinates relative to an object into global coordinates.
+
+[View Documentation](https://docs.atomontage.com/api/Transform#Vec3-LocalToWorld-Vec3)
+]]
 --- @param p1 Vec3
 --- @return Vec3
 function Transform:LocalToWorld(p1) end
 
+--[[
+Converts a world position to local space, making it useful for determining an object's position relative to another object.
+
+[View Documentation](https://docs.atomontage.com/api/Transform#Vec3-WorldToLocal-Vec3)
+]]
 --- @param p1 Vec3
 --- @return Vec3
 function Transform:WorldToLocal(p1) end
@@ -3471,10 +4230,20 @@ function Transform:LocalToWorldVec(p1) end
 --- @return Vec3
 function Transform:WorldToLocalVec(p1) end
 
+--[[
+Adjusts the object's rotation to look at a specified point in the world, aligning it with the target position.
+
+[View Documentation](https://docs.atomontage.com/api/Transform#nil-LookAt-Vec3)
+]]
 --- @param p1 Vec3
 --- @return nil
 function Transform:LookAt(p1) end
 
+--[[
+A more customizable version of LookAt, allowing you to specify both the target point and an up direction for the object's orientation.
+
+[View Documentation](https://docs.atomontage.com/api/Transform#nil-LookAt-Vec3-Vec3)
+]]
 --- @param p1 Vec3
 --- @param p2 Vec3
 --- @return nil
@@ -3497,6 +4266,46 @@ function UIItem:GetType() end
 
 --- @return string
 function UIItem:GetLabel() end
+
+--[[
+`Client`
+`Server`
+
+[View Documentation](https://docs.atomontage.com/api/VVCollision)
+]]
+--- @class VVCollision
+--- @field filter Filter
+--- @field traversalStopVxSize number
+--- @field detectionGeometryDetail number
+--- @field globalVisibleLocalVisible boolean
+--- @field globalInvisibleLocalVisible boolean
+--- @field globalVisibleLocalInvisible boolean
+--- @field globalInvisibleLocalInvisible boolean
+--- @field rayPos Vec3
+--- @field rayDir Vec3
+VVCollision = {
+	traversalStopVxSize = nil, ---this parameter will be set to smallest voxel that should be traversed (unless it is SUPERNODE - in that case traversal will go deeper)- it can be calculated even for a stretched transformed entity once before its node graph traversal- if a voxel in a node is larger than this, children of the node will be traversed- in top level CD routine(s) the size is in the same coords scale as prim (ie in the provided world (WC) size scale)- in deep CD routines the size is in DC coords scale (it was calculated such if entity has transform)
+}
+
+--- @return VVCollision
+function VVCollision() end
+
+--- @return VVCollision
+function VVCollision() end
+
+--- @return table
+function VVCollision:Raycast() end
+
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @return table
+function VVCollision:Raycast(p1, p2) end
+
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @param p3 number
+--- @return table
+function VVCollision:CapsuleOverlap(p1, p2, p3) end
 
 --[[
 `Client`
@@ -4251,7 +5060,15 @@ function Vec2i:__tostring(p1) end
 --- @field down Vec3
 --- @field left Vec3
 --- @field back Vec3
-Vec3 = {}
+Vec3 = {
+	zero = nil, ---Vec3(0,0,0)
+	up = nil, ---Vec3(0,1,0)
+	right = nil, ---Vec3(1,0,0)
+	forward = nil, ---Vec3(0,0,-1)
+	down = nil, ---Vec3(0,-1,0)
+	left = nil, ---Vec3(-1,0,0)
+	back = nil, ---Vec3(0,0,1)
+}
 
 --- @return Vec3
 function Vec3() end
@@ -4517,6 +5334,9 @@ function Vec3:__eq(p1, p2) end
 function Vec3:Len() end
 
 --- @return number
+function Vec3:LenSqr() end
+
+--- @return number
 function Vec3:Length() end
 
 --- @return number
@@ -4601,9 +5421,23 @@ function Vec3:Round(p1) end
 --- @return Vec3
 function Vec3:GetRounded(p1) end
 
+--- @return number
+function Vec3:Min() end
+
+--- @return number
+function Vec3:Max() end
+
 --- @param p1 Vec3
 --- @return number
 function Vec3:DistanceTo(p1) end
+
+--- @param p1 Vec3
+--- @return number
+function Vec3:Dist(p1) end
+
+--- @param p1 Vec3
+--- @return number
+function Vec3:DistSqr(p1) end
 
 --- @param p1 Vec3
 --- @param p2 Vec3
@@ -4932,6 +5766,9 @@ function Vec3i:__eq(p1, p2) end
 function Vec3i:Len() end
 
 --- @return integer
+function Vec3i:LenSqr() end
+
+--- @return integer
 function Vec3i:Length() end
 
 --- @return integer
@@ -5075,6 +5912,7 @@ function Vec3i:__tostring(p1) end
 --- @operator sub(number):Vec4
 --- @operator mul(Vec4):Vec4
 --- @operator mul(Vec4i):Vec4
+--- @operator mul(Mat4):Vec4
 --- @operator mul(number):Vec4
 --- @operator div(Vec4):Vec4
 --- @operator div(Vec4i):Vec4
@@ -5496,6 +6334,11 @@ function Vec4:__mul(p1, p2) end
 function Vec4:__mul(p1, p2) end
 
 --- @param p1 Vec4
+--- @param p2 Mat4
+--- @return Vec4
+function Vec4:__mul(p1, p2) end
+
+--- @param p1 Vec4
 --- @param p2 number
 --- @return Vec4
 function Vec4:__mul(p1, p2) end
@@ -5690,6 +6533,7 @@ function Vec4:__tostring(p1) end
 --- @operator sub(integer):Vec4i
 --- @operator mul(Vec4i):Vec4i
 --- @operator mul(Vec4):Vec4
+--- @operator mul(Mat4):Vec4i
 --- @operator mul(integer):Vec4i
 --- @operator div(Vec4i):Vec4i
 --- @operator div(Vec4):Vec4
@@ -6122,6 +6966,11 @@ function Vec4i:__mul(p1, p2) end
 function Vec4i:__mul(p1, p2) end
 
 --- @param p1 Vec4i
+--- @param p2 Mat4
+--- @return Vec4i
+function Vec4i:__mul(p1, p2) end
+
+--- @param p1 Vec4i
 --- @param p2 integer
 --- @return Vec4i
 function Vec4i:__mul(p1, p2) end
@@ -6337,6 +7186,10 @@ function Vec4i:__shr(p1, p2) end
 `Client`
 `Server`
 
+:::warning Deprecated
+The voxel edit functions in this class are old and may not correctly work. Instead use [Vox](/docs/manual/20-scripting/examples/Voxel-Edits.mdx).
+:::
+
 [View Documentation](https://docs.atomontage.com/api/VoxelDB)
 ]]
 --- @class VoxelDB
@@ -6352,7 +7205,7 @@ VoxelDB = {}
 function VoxelDB:Clear() end
 
 --[[
-Flush() adds special operation in queue, which waits for all running ops to finish.
+Flush() adds a special operation in the queue, which waits for all running ops to finish.
 If we had flush after each op, it would eliminate all multithreaded processing.
 
 [View Documentation](https://docs.atomontage.com/api/VoxelDB#nil-Flush)
@@ -6396,11 +7249,11 @@ function VoxelDB:GetMask(p1) end
 function VoxelDB:GetMask(p1, p2, p3) end
 
 --[[
-int is the neighbourhood radius, 1 means it's from pos - 1 to pos + 1, 
-sum of voxles in 3x3 square without center (0-26)
+int is the neighborhood radius, 1 means it's from pos - 1 to pos + 1, 
+sum of voxels in 3x3 square without center (0-26)
 it should be in range 1-8
 
-[View Documentation](https://docs.atomontage.com/api/VoxelDB#int-GetMaskNeighbours-Vec3i-int)
+[View Documentation](https://docs.atomontage.com/api/VoxelDB#integer-GetMaskNeighbours-Vec3i-integer)
 ]]
 --- @param p1 Vec3i
 --- @param p2 integer
@@ -6765,34 +7618,42 @@ function VoxelDB:GetLayerStats(p1) end
 --- @return table
 function VoxelDB:GetUsedLayers() end
 
---- @return number, number
-function VoxelDB:GetBounds() end
+--[[
+World position and size of AABB (axis-aligned bounding box) of the static voxel data
+
+[View Documentation](https://docs.atomontage.com/api/VoxelDB#Vec3-Vec3-GetAABounds)
+]]
+--- @return Vec3, Vec3
+function VoxelDB:GetAABounds() end
 
 --[[
 `Client`
 `Server`
 
+Component that holds voxel data. The actual data itself is in the `data` property.
+The data will only render if the object also has a `VoxelRender` component.
+
 [View Documentation](https://docs.atomontage.com/api/VoxelData)
 ]]
 --- @class VoxelData
+--- @field copyOnWrite boolean
 --- @field object Object
 --- @field isDestroyed boolean
 --- @field type string
+--- @field Active boolean
+--- @field ActiveInHierarchy boolean
+--- @field Object Object
+--- @field IsDestroyed boolean
+--- @field Type string
+--- @field Size Vec3
 --- @field path string
+--- @field originalPath string
 --- @field data VoxelDataResource
---- @field copyOnWrite boolean
 --- @field save boolean
---- @field unpackOnLoad boolean
---- @field releaseResources boolean
---- @field enforceReplaceRendSourceAndEntity boolean
---- @field ramCopy boolean
---- @field potScale integer
---- @field paused boolean
---- @field startAtMs integer
---- @field startAtFrame number
---- @field playbackSpeed number
+--- @field editable boolean
 VoxelData = {
 	copyOnWrite = nil, ---make local copy of voxel data resource if edited 
+	data = nil, ---The voxel data resource that this voxel data is using
 }
 
 --- @return VoxelData
@@ -6803,9 +7664,27 @@ function VoxelData() end
 --- @return nil
 function VoxelData:Mirror(p1, p2) end
 
+--- @return Vec3, Vec3
+function VoxelData:GetAABounds() end
+
+--- @return Vec3, Quat, Vec3
+function VoxelData:GetBounds() end
+
 --- @param p1 string
 --- @return boolean, string
 function VoxelData:SetPath(p1) end
+
+--[[
+Async version of SetPath. Function returns immediately and voxel data loading is performed on background. After it finishes (or fails), supplied callback is called. Callback has parameters `boolean success` and `string errStr`.
+
+If load is already running when new SetPathAsync is called, the new load is queued and performed after the current one finishes (SetPathAsync still exists immediatelly). In the future we may have more advanced strategy for handling concurrent loads.
+
+[View Documentation](https://docs.atomontage.com/api/VoxelData#nil-SetPathAsync-string-userdata)
+]]
+--- @param p1 string
+--- @param p2 userdata
+--- @return nil
+function VoxelData:SetPathAsync(p1, p2) end
 
 --- @param p1 VoxelData
 --- @param p2 VoxelData
@@ -6823,7 +7702,10 @@ function VoxelData:__eq(p1, p2) end
 --- @field isSaved boolean
 --- @field hasAnyVoxels boolean
 --- @field volumePerc number
+--- @field volume number
 --- @field scaleToStatic number
+--- @field loadLodScale number
+--- @field voxelSize number
 VoxelDataResource = {
 	isEditable = nil, ---returns false if loaded as aevv
 	isSaved = nil, ---returns true if data was modified
@@ -6831,30 +7713,38 @@ VoxelDataResource = {
 }
 
 --- @param p1 string
---- @param p2 boolean
 --- @return VoxelDataResource
-function VoxelDataResource(p1, p2) end
+function VoxelDataResource(p1) end
 
 --- @return VoxelDataResource
 function VoxelDataResource() end
-
---- @param p1 string
---- @return VoxelDataResource
-function VoxelDataResource(p1) end
 
 --[[
 save voxel data in AM file
 second parameter controls if file will be overwritten
 
-[View Documentation](https://docs.atomontage.com/api/VoxelDataResource#string-Save-string-bool)
+[View Documentation](https://docs.atomontage.com/api/VoxelDataResource#string-Save-string-boolean)
 ]]
 --- @param p1 string
 --- @param p2 boolean
 --- @return string
 function VoxelDataResource:Save(p1, p2) end
 
---- @return number, number
-function VoxelDataResource:GetBounds() end
+--[[
+get center (in local space) and approximate dimensions of the voxel data
+
+[View Documentation](https://docs.atomontage.com/api/VoxelDataResource#Vec3-Vec3-GetLocalBounds)
+]]
+--- @return Vec3, Vec3
+function VoxelDataResource:GetLocalBounds() end
+
+--[[
+get center (in local space) and dimensions of the voxel data
+
+[View Documentation](https://docs.atomontage.com/api/VoxelDataResource#Vec3-Vec3-GetPreciseLocalBounds)
+]]
+--- @return Vec3, Vec3
+function VoxelDataResource:GetPreciseLocalBounds() end
 
 --- @return userdata
 function VoxelDataResource:Duplicate() end
@@ -6865,6 +7755,90 @@ function VoxelDataResource:RebuildLighting() end
 --[[
 `Client`
 `Server`
+
+:::warning Deprecated
+The voxel edit functions in this class are old and may not correctly work. Instead use [Vox](/docs/manual/20-scripting/examples/Voxel-Edits.mdx).
+:::
+
+:::info Server Only
+ Currently voxel edits can only be done on the server side.
+:::
+
+Use this class to create voxel edits.
+
+Use this class by first creating a `VoxelEdit` object, then setting the properties such as `shape` and `color` and finally calling one of the edit methods:
+* `Paint()`
+* `Add()`
+* `Remove()`
+* `Copy()`
+* `Kernel()`
+
+
+```lua
+function self:makeLine(p1, p2)
+    --first create a VoxelEdit object
+    local ve = VoxelEdit()
+
+    --modify some properties
+    local thickness = 0.2
+    ve.shape = Capsule(p1, p2, thickness)
+    ve.color = Vec3(1, 0, 1)
+
+    --call the edit method
+    ve:Add()
+end
+```
+
+Every scene has only **one** static voxel data and can have multiple dynamic voxel data. The static voxel data is used for the world and can not be moved.
+However both can be edited. To choose whether to edit the static or dynamic voxel data, use the `filter` property.
+ 
+```lua
+--create an object with voxel data and renderer
+local ob = Scene:CreateObject("Voxel Sphere")
+local vd = ob:AddComponent("VoxelData")
+local vr = ob:AddComponent("VoxelRenderer")
+local vres = VoxelDataResource() --new empty voxel data
+vd.data = vres
+ob.transform.pos = Vec3(0, 30, 0)
+
+--voxel edit    
+local ve = VoxelEdit()
+
+--target the object and ignore static voxels
+ve.filter.useStatic = false
+ve.filter.forceList = { ob }
+
+--add sphere
+ve.color = Vec3(0,0.5,1)
+ve.shape = Sphere(ob.transform.pos, 1)
+ve:Add()
+```
+
+Use the copy operation to copy voxels from one object to others or the static voxel data.
+
+```lua
+--select some object with voxel data here
+local copyFrom = Scene:GetObjectByName("Voxel Sphere")
+
+local ve = VoxelEdit()
+
+--make a box fitting the target to copy from
+local b = Box()
+local center, size = copyFrom:GetComponentByType("VoxelRenderer"):GetBounds()
+b.pos = center
+b.size = size
+ve.shape = b
+ve.filter.useNotStatic = false
+
+--select what data to copy and its pasted transformation
+ve.copyResource = copyFrom:GetComponentByType("VoxelData").data
+ve.copyDestinationPos = copyFrom.transform.pos
+ve.copyDestinationRot = copyFrom.transform.rot
+ve.copyDestinationScale = copyFrom.transform.scale
+ve:Copy()
+```
+
+See a different example [here](../manual/scripting/examples/Voxel-Edits)
 
 [View Documentation](https://docs.atomontage.com/api/VoxelEdit)
 ]]
@@ -6886,17 +7860,39 @@ function VoxelDataResource:RebuildLighting() end
 --- @field copySourceRot Quat
 --- @field copySourceScale number
 --- @field copyResource userdata
---- @field copyInsert boolean
---- @field copyRemove boolean
---- @field copyColor boolean
+--- @field roughness number
+--- @field roughnessEnable boolean
+--- @field metallicity number
+--- @field metallicityEnable boolean
+--- @field removeType RemoveType
+--- @field removeHardness number
+--- @field useMaterialColor boolean
+--- @field material string
+--- @field removeList table
+--- @field carveList table
+--- @field removeCountList table
+--- @field removeStats boolean
+--- @field usesPbr boolean
+--- @field copyOperation CopyOperation
+--- @field insertOperation InsertOperation
 --- @field kernelType integer
+--- @field imageColor userdata
+--- @field imageNormal userdata
+--- @field imageUVTm Mat4
+--- @field imageUVClamp boolean
+--- @field imageNormalBlendEnable boolean
+--- @field imageNormalBlendPower number
 --- @field onProgress userdata
 --- @field onFinished userdata
 --- @field onError userdata
 VoxelEdit = {
+	blendMode = nil, ---Various blend modes which you may know from Photoshop. See a list of explanations [here](https://photoshoptrainingchannel.com/blending-modes-explained/#normal-blending-modes).
 	shape = nil, ---if shape is nil the operation will match all targets 
+	clampToMinVoxelSize = nil, ---if ClampToMinVoxelSize is true (it's default), it sets size of shape to at least size of voxel size of target. This can interfere with your box size if it's too small.
+	kernelType = nil, ---0 = Smooth 7x5x71 = Smooth 3x3x32 = Smooth 5x5x53 = Inflate4 = Deflate5 = Normals smooth6 = Normals sharp
 	onProgress = nil, ---callback function. progress from 0-1. May not be called every frame. Is called after script updates 
 	onFinished = nil, ---callback function. onFinished is called after onProgress if it was last part
+	onError = nil, ---callback function
 }
 
 --- @return VoxelEdit
@@ -6911,29 +7907,69 @@ function VoxelEdit(p1, p2) end
 --- @return VoxelEdit
 function VoxelEdit(p1) end
 
+--[[
+Flush() adds a special operation in the queue, which waits for all running ops to finish.
+If we had flush after each op, it would eliminate all multithreaded processing.
+
+[View Documentation](https://docs.atomontage.com/api/VoxelEdit#nil-Flush)
+]]
 --- @return nil
 function VoxelEdit:Flush() end
 
+--[[
+Change the color of voxels
+
+[View Documentation](https://docs.atomontage.com/api/VoxelEdit#nil-Paint)
+]]
 --- @return nil
 function VoxelEdit:Paint() end
 
+--[[
+Add voxels
+
+[View Documentation](https://docs.atomontage.com/api/VoxelEdit#nil-Add)
+]]
 --- @return nil
 function VoxelEdit:Add() end
 
---- @return nil
-function VoxelEdit:Erase() end
+--[[
+Remove voxels
 
+[View Documentation](https://docs.atomontage.com/api/VoxelEdit#nil-Remove)
+]]
+--- @return nil
+function VoxelEdit:Remove() end
+
+--[[
+Copy voxels somewhere
+
+[View Documentation](https://docs.atomontage.com/api/VoxelEdit#nil-Copy)
+]]
 --- @return nil
 function VoxelEdit:Copy() end
 
+--[[
+Smoothing/Inflate/Deflate
+
+[View Documentation](https://docs.atomontage.com/api/VoxelEdit#nil-Kernel)
+]]
 --- @return nil
 function VoxelEdit:Kernel() end
+
+--- @param p1 Mat4
+--- @param p2 number
+--- @return Image
+function VoxelEdit:CaptureImage(p1, p2) end
+
+--- @param p1 string
+--- @return Image
+function VoxelEdit:GetImageResource(p1) end
 
 --[[
 It projects cone on voxel geometry and everything inside will be copies to tmp
 all raycasts will collide with this tmp layer instead until FreeTmpLayers
 
-[View Documentation](https://docs.atomontage.com/api/VoxelEdit#nil-FreeTmpLayers-int)
+[View Documentation](https://docs.atomontage.com/api/VoxelEdit#nil-FreeTmpLayers-integer)
 ]]
 --- @param p1 integer
 --- @return nil
@@ -6944,7 +7980,7 @@ It projects cone on voxel geometry and everything inside will be copies to tmp
 all raycasts will collide with this tmp layer instead until FreeTmpLayers
 parameters specify "cone" - two positions and end radius
 
-[View Documentation](https://docs.atomontage.com/api/VoxelEdit#nil-FillTmpLayers-int-Vec3-table-float-int)
+[View Documentation](https://docs.atomontage.com/api/VoxelEdit#nil-FillTmpLayers-integer-Vec3-table-number-integer)
 ]]
 --- @param p1 integer
 --- @param p2 Vec3
@@ -6953,6 +7989,39 @@ parameters specify "cone" - two positions and end radius
 --- @param p5 integer
 --- @return nil
 function VoxelEdit:FillTmpLayers(p1, p2, p3, p4, p5) end
+
+--- @return table
+function VoxelEdit:GetMaterialNames() end
+
+--- @param p1 string
+--- @return table
+function VoxelEdit:GetMaterial(p1) end
+
+--- @param p1 string
+--- @param p2 table
+--- @return nil
+function VoxelEdit:SetMaterial(p1, p2) end
+
+--- @param p1 string
+--- @param p2 number
+--- @param p3 number
+--- @return nil
+function VoxelEdit:SetStaticSceneMaterial(p1, p2, p3) end
+
+--- @param p1 VoxelDataResource
+--- @param p2 string
+--- @return nil
+function VoxelEdit:SetVoxelDataResourceMaterial(p1, p2) end
+
+--- @param p1 VoxelDataResource
+--- @param p2 string
+--- @param p3 string
+--- @param p4 boolean
+--- @return nil
+function VoxelEdit:ReplaceVoxelDataResourceMaterial(p1, p2, p3, p4) end
+
+--- @return nil
+function VoxelEdit:BackupSurfaceAttributes() end
 
 --[[
 `Client`
@@ -6979,63 +8048,104 @@ function VoxelInspectData:GetColors() end
 `Client`
 `Server`
 
+The data will only render if the object also has a `VoxelData` component with data assigned.
+
 [View Documentation](https://docs.atomontage.com/api/VoxelRenderer)
 ]]
 --- @class VoxelRenderer
 --- @field object Object
 --- @field isDestroyed boolean
 --- @field type string
+--- @field Active boolean
+--- @field ActiveInHierarchy boolean
+--- @field Object Object
+--- @field IsDestroyed boolean
+--- @field Type string
 --- @field syncToClients boolean
 --- @field enabled boolean
 --- @field prioritizeLod boolean
 --- @field outline boolean
 --- @field tintColor Vec4
 --- @field receiveTransform boolean
-VoxelRenderer = {}
+--- @field Simulate boolean
+--- @field SimulationPaused boolean
+--- @field Velocity Vec3
+--- @field AngularVelocity Vec3
+--- @field Mass number
+--- @field Inertia Vec3
+--- @field Friction number
+--- @field Restitution number
+--- @field Drag number
+--- @field AngularDrag number
+VoxelRenderer = {
+	prioritizeLod = nil, ---Try to load higher LODs faster than those of other objects
+	outline = nil, ---Draw an outline around this object
+	tintColor = nil, ---Render with a tint color
+	receiveTransform = nil, ---Receive transform(pos, rot scale) to render with from server. By default this is true. If you set this to false, you will need to manually set the transform of the object on the client side.This is useful for making objects respond immediately if something happened on the client side i.e. input
+}
+
+--- @param p1 Vec3
+--- @param p2 Vec3
+--- @return nil
+function VoxelRenderer:AddImpulse(p1, p2) end
+
+--- @param p1 Vec3
+--- @return nil
+function VoxelRenderer:AddAngularImpulse(p1) end
+
+--- @param p1 Vec3
+--- @return nil
+function VoxelRenderer:AddForce(p1) end
+
+--- @param p1 Vec3
+--- @return nil
+function VoxelRenderer:AddTorque(p1) end
+
+--- @param p1 Vec3
+--- @return nil
+function VoxelRenderer:AddAcceleration(p1) end
+
+--- @param p1 Vec3
+--- @return nil
+function VoxelRenderer:AddAngularAcceleration(p1) end
+
+--[[
+World position and size of AABB (axis-aligned bounding box) of the object
+
+[View Documentation](https://docs.atomontage.com/api/VoxelRenderer#Vec3-Vec3-GetAABounds)
+]]
+--- @return Vec3, Vec3
+function VoxelRenderer:GetAABounds() end
+
+--- @return Vec3, Quat, Vec3
+function VoxelRenderer:GetBounds() end
 
 --- @param p1 VoxelRenderer
 --- @param p2 VoxelRenderer
 --- @return boolean
 function VoxelRenderer:__eq(p1, p2) end
 
---- @return number, number
-function VoxelRenderer:GetBounds() end
-
---- @enum AttachmentFlags
-AttachmentFlags = {
-	-- test
-	Depth = 0,
-	DepthAndStencil = 1,
-	-- bladdddla
-	Color0 = 2,
-	Color1 = 3,
-	Color2 = 4,
-	Color3 = 5,
+--- @enum AlignmentType
+AlignmentType = {
+	AlignToTopLeft = 0,
+	AlignToTopRight = 1,
+	AlignToBottomLeft = 2,
+	AlignToBottomRight = 3,
+	AlignToTopCenter = 4,
+	AlignToBottomCenter = 5,
+	AlignToLeftCenter = 6,
+	AlignToRightCenter = 7,
+	AlignToCenter = 8,
+	ScaleToFit = 9,
 }
 
---- @enum BlendFactor
-BlendFactor = {
-	Zero = 0,
-	SrcColor = 1,
-	DstColor = 2,
-	OneMinusDstColor = 3,
-	SrcAlpha = 4,
-	OneMinusSrcAlpha = 5,
-	DstAlpha = 6,
-	OneMinusDstAlpha = 7,
-	One = 8,
-	OneMinusSrcColor = 9,
-	ConstantColor = 10,
-	OneMinusConstantColor = 11,
-	ConstantAlpha = 12,
-	OneMinusConstantAlpha = 13,
-	SrcAlphaSaturate = 14,
-	Src1Color = 15,
-	OneMinusSrc1Color = 16,
-	Src1Alpha = 17,
-	OneMinusSrc1Alpha = 18,
-}
+--[[
 
+Used by [VoxelEdit](../VoxelEdit#BlendMode-blendMode)
+See a list of explanations [here](https://photoshoptrainingchannel.com/blending-modes-explained/#normal-blending-modes).
+
+[View Documentation](https://docs.atomontage.com/api/BlendMode)
+]]
 --- @enum BlendMode
 BlendMode = {
 	Normal = 0,
@@ -7066,19 +8176,19 @@ BlendMode = {
 	Luminosity = 25,
 }
 
---- @enum BlendOp
-BlendOp = {
-	Add = 0,
-	Subtract = 1,
-	ReverseSubtract = 2,
-	Min = 3,
-	Max = 4,
-}
-
 --- @enum ClientMode
 ClientMode = {
 	View = 0,
 	Edit = 1,
+	DevDebug = 2,
+}
+
+--- @enum CopyOperation
+CopyOperation = {
+	InsertColor = 0,
+	CopyColor = 1,
+	Carve = 2,
+	CarveColor = 3,
 }
 
 --- @enum CpuArch
@@ -7091,54 +8201,11 @@ CpuArch = {
 	Wasm = 5,
 }
 
---- @enum CullMode
-CullMode = {
-	None = 0,
-	Front = 1,
-	Back = 2,
-	FrontAndBack = 3,
-}
-
---- @enum DepthBufferMode
-DepthBufferMode = {
-	None = 0,
-	DepthOnly = 1,
-	DepthAndStencil = 2,
-}
-
 --- @enum Device
 Device = {
 	Generic = 0,
 	Quest = 1,
 	MagicLeap2 = 2,
-}
-
---- @enum DrawingCommandsFlags
-DrawingCommandsFlags = {
-	BaseVertex = 0,
-	BaseInstance = 1,
-	BaseVertexBaseInstance = 2,
-	MultiBaseVertex = 3,
-	MultiBaseInstance = 4,
-	MultiBaseVertexBaseInstance = 5,
-}
-
---- @enum FrontFaceWinding
-FrontFaceWinding = {
-	Clockwise = 0,
-	CounterClockwise = 1,
-}
-
---- @enum Function
-Function = {
-	Never = 0,
-	Less = 1,
-	Equal = 2,
-	Greater = 3,
-	Notequal = 4,
-	Gequal = 5,
-	Always = 6,
-	Lequal = 7,
 }
 
 --- @enum HitType
@@ -7149,6 +8216,13 @@ HitType = {
 	ObjectVoxel = 3,
 }
 
+--- @enum InsertOperation
+InsertOperation = {
+	Normal = 0,
+	Empty = 1,
+	Full = 2,
+}
+
 --- @enum LuaErrorType
 LuaErrorType = {
 	None = 0,
@@ -7157,16 +8231,11 @@ LuaErrorType = {
 	UIAction = 3,
 }
 
---- @enum Operation
-Operation = {
-	Keep = 0,
-	Zero = 1,
-	Replace = 2,
-	Increment = 3,
-	IncrementWrap = 4,
-	Decrement = 5,
-	DecrementWrap = 6,
-	Invert = 7,
+--- @enum PhysSimEventType
+PhysSimEventType = {
+	Unspecified = 0,
+	Impulse = 1,
+	Force = 2,
 }
 
 --- @enum PixelFormat
@@ -7217,13 +8286,7 @@ PixelFormat = {
 	RGBA16U = 43,
 	SRGB888 = 44,
 	SRGB888A8 = 45,
-}
-
---- @enum PolygonMode
-PolygonMode = {
-	Fill = 0,
-	Line = 1,
-	Point = 2,
+	RGB10A2 = 46,
 }
 
 --- @enum PrimitiveTopology
@@ -7236,6 +8299,14 @@ PrimitiveTopology = {
 	Triangles = 5,
 }
 
+--- @enum RemoveType
+RemoveType = {
+	All = 0,
+	Hardness = 1,
+	List = 2,
+	SharpList = 3,
+}
+
 --- @enum RendererStateFlags
 RendererStateFlags = {
 	Shadows = 0,
@@ -7245,6 +8316,7 @@ RendererStateFlags = {
 	DepthPass = 4,
 	VR = 5,
 	PBR = 6,
+	IBL = 7,
 }
 
 --[[
@@ -7273,53 +8345,6 @@ ShaderPrecisionType = {
 	HighInt = 5,
 }
 
---- @enum ShaderResourceType
-ShaderResourceType = {
-	Unknown = 0,
-	Bool = 1,
-	BoolVec2 = 2,
-	BoolVec3 = 3,
-	BoolVec4 = 4,
-	Int = 5,
-	IntVec2 = 6,
-	IntVec3 = 7,
-	IntVec4 = 8,
-	UInt = 9,
-	UIntVec2 = 10,
-	UIntVec3 = 11,
-	UIntVec4 = 12,
-	Float = 13,
-	FloatVec2 = 14,
-	FloatVec3 = 15,
-	FloatVec4 = 16,
-	FloatMat2x2 = 17,
-	FloatMat2x3 = 18,
-	FloatMat2x4 = 19,
-	FloatMat3x2 = 20,
-	FloatMat3x3 = 21,
-	FloatMat3x4 = 22,
-	FloatMat4x2 = 23,
-	FloatMat4x3 = 24,
-	FloatMat4x4 = 25,
-	Double = 26,
-	DoubleVec2 = 27,
-	DoubleVec3 = 28,
-	DoubleVec4 = 29,
-	DoubleMat2x2 = 30,
-	DoubleMat2x3 = 31,
-	DoubleMat2x4 = 32,
-	DoubleMat3x2 = 33,
-	DoubleMat3x3 = 34,
-	DoubleMat3x4 = 35,
-	DoubleMat4x2 = 36,
-	DoubleMat4x3 = 37,
-	DoubleMat4x4 = 38,
-	Image = 39,
-	Texture = 40,
-	Buffer = 41,
-	AccelerationStructure = 42,
-}
-
 --- @enum Side
 Side = {
 	Left = 0,
@@ -7343,20 +8368,12 @@ System = {
 	Android = 6,
 }
 
---- @enum TextureFiltering
-TextureFiltering = {
-	None = 0,
-	Linear = 1,
-	Bilinear = 2,
-	Trilinear = 3,
-	Anisotropic = 4,
-}
-
---- @enum TextureWrappingMode
-TextureWrappingMode = {
-	ClampToEdge = 0,
-	Repeat = 1,
-	MirroredRepeat = 2,
+--- @enum TextureType
+TextureType = {
+	Unknown = 0,
+	Cube = 1,
+	Dome = 2,
+	Sphere = 3,
 }
 
 --- @enum TmpLayerFlags
@@ -7364,18 +8381,6 @@ TmpLayerFlags = {
 	None = 0,
 	Common = 1,
 	Atlas = 2,
-}
-
---- @enum Type
-Type = {
-	Unknown = 0,
-	Texture1D = 1,
-	Texture1DArray = 2,
-	Texture2D = 3,
-	Texture2DArray = 4,
-	Texture3D = 5,
-	TextureCube = 6,
-	TextureCubeArray = 7,
 }
 
 --- @enum UIActionsPlace
@@ -7412,28 +8417,6 @@ UIItemType = {
 	Count = 22,
 }
 
---- @enum UpdateFrequency
-UpdateFrequency = {
-	Once = 0,
-	Frame = 1,
-	ObjectFrame = 2,
-	ObjectDraw = 3,
-}
-
---- @enum UsageFlagBits
-UsageFlagBits = {
-	UsageTransferSrcBIT = 0,
-	UsageTransferDstBIT = 1,
-	UsageSampledBIT = 2,
-	UsageStorageBIT = 3,
-	UsageColorAttachmentBIT = 4,
-	UsageDepthStencilAttachmentBIT = 5,
-	UsageTransientAttachmentBIT = 6,
-	UsageInputAttachmentBIT = 7,
-	UsageShadingRateImageBIT = 8,
-	UsageFragmentDensityMapBIT = 9,
-}
-
 --- @enum VRControllerButton
 VRControllerButton = {
 	A = 0,
@@ -7443,96 +8426,5 @@ VRControllerButton = {
 	Trigger = 4,
 	Grip = 5,
 	Shoulder = 6,
-}
-
---- @enum VSyncMode
-VSyncMode = {
-	Default = 0,
-	Enabled = 1,
-	Disabled = 2,
-	Adaptive = 3,
-}
-
---- @enum VertexComponent
-VertexComponent = {
-	Position0 = 0,
-	Position1 = 1,
-	Position2 = 2,
-	Position3 = 3,
-	TexCoord0 = 4,
-	TexCoord1 = 5,
-	TexCoord2 = 6,
-	TexCoord3 = 7,
-	TexCoord4 = 8,
-	Color0 = 9,
-	Color1 = 10,
-	Index0 = 11,
-	Index1 = 12,
-	Normal0 = 13,
-	Normal1 = 14,
-	Tangent = 15,
-	Bitangent = 16,
-	Index = 17,
-	Unknown = 18,
-	Data0 = 19,
-	Data1 = 20,
-	Data2 = 21,
-	Data3 = 22,
-	Data4 = 23,
-}
-
---- @enum VertexComponentFormat
-VertexComponentFormat = {
-	Unknown = 0,
-	Int8 = 1,
-	Int8Vec2 = 2,
-	Int8Vec3 = 3,
-	Int8Vec4 = 4,
-	Int16 = 5,
-	Int16Vec2 = 6,
-	Int16Vec3 = 7,
-	Int16Vec4 = 8,
-	Int32 = 9,
-	Int32Vec2 = 10,
-	Int32Vec3 = 11,
-	Int32Vec4 = 12,
-	UInt8 = 13,
-	UInt8Vec2 = 14,
-	UInt8Vec3 = 15,
-	UInt8Vec4 = 16,
-	UInt16 = 17,
-	UInt16Vec2 = 18,
-	UInt16Vec3 = 19,
-	UInt16Vec4 = 20,
-	UInt32 = 21,
-	UInt32Vec2 = 22,
-	UInt32Vec3 = 23,
-	UInt32Vec4 = 24,
-	Float = 25,
-	FloatVec2 = 26,
-	FloatVec3 = 27,
-	FloatVec4 = 28,
-	FloatMat2x2 = 29,
-	FloatMat2x3 = 30,
-	FloatMat2x4 = 31,
-	FloatMat3x2 = 32,
-	FloatMat3x3 = 33,
-	FloatMat3x4 = 34,
-	FloatMat4x2 = 35,
-	FloatMat4x3 = 36,
-	FloatMat4x4 = 37,
-	Double = 38,
-	DoubleVec2 = 39,
-	DoubleVec3 = 40,
-	DoubleVec4 = 41,
-	DoubleMat2x2 = 42,
-	DoubleMat2x3 = 43,
-	DoubleMat2x4 = 44,
-	DoubleMat3x2 = 45,
-	DoubleMat3x3 = 46,
-	DoubleMat3x4 = 47,
-	DoubleMat4x2 = 48,
-	DoubleMat4x3 = 49,
-	DoubleMat4x4 = 50,
 }
 
