@@ -51,8 +51,9 @@
 		"sumneko.lua"
 	],
 	"scripts": {
-		"patch": "vsce publish patch && git push",
-		"minor": "vsce publish minor && git push",
+		"patch": "vsce publish patch && vsce package && ovsx publish *.vsix -p $OVSX_PAT && git push",
+		"minor": "vsce publish minor && vsce package && ovsx publish *.vsix -p $OVSX_PAT && git push",
+		"major": "vsce publish major && vsce package && ovsx publish *.vsix -p $OVSX_PAT && git push",
 		"vscode:prepublish": "yarn run compile",
 		"compile": "tsc -p ./",
 		"watch": "tsc -watch -p ./",
